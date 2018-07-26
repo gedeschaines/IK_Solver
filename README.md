@@ -127,7 +127,7 @@ of the program's development and maintenance.
      http://www.math.ucsd.edu/~sbuss/ResearchWeb/ikmethods/iksurvey.pdf
 
 These reference documents are provided in the ./refs subdirectory in the event
-their associated web links are broken. For additonal reference information,
+their associated web links are broken. For additional reference information,
 software, demos and tutorials on physics-based animation, inverse kinematics
 and 3D computer graphics see Ben Kenwright's [XBDEV.NET](http://www.xbdev.net/index.php)
 website, Edinburgh Napier University Games Development [Resources](http://games.soc.napier.ac.uk/resources.html), and Sam Buss's [Publications and Other Research](http://www.math.ucsd.edu/~sbuss/ResearchWeb/index.html) web page.
