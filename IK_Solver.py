@@ -390,11 +390,11 @@ if __name__ == '__main__':
   # Specify animation parameters and assign functions.
    
   nframes = None
-  blit    = False  # blitting not working good with Matplotlib v1.5.1+
+  blit    = False  # blitting not working well with Matplotlib v1.5.1+
   if Record == 1 :
     nframes = 14*FPS
     blit    = False
-  
+
   if Plot3D == 0 :
     anim = animation.FuncAnimation(fig, animate2D, init_func=init2D,
                                    frames=nframes, blit=blit,  
@@ -427,5 +427,5 @@ if __name__ == '__main__':
     plt.show()
 
   # Terminate and exit.
-  
+
   del ik_solver
