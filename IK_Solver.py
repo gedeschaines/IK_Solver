@@ -426,7 +426,6 @@ if __name__ == '__main__':
     print("Animation saved in file %s" % filename)
     plt.show()
 
-  # Terminate.
+  # Terminate and exit.
   
   del ik_solver
-  exit

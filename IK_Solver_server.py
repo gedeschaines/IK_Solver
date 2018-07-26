@@ -270,9 +270,6 @@ if __name__ == '__main__':
       del ik_solver
       ik_solver = 0
       
-  # Terminate processing.
+  # Terminate processing and exit.
   
   tcpSerSock.close()
-  
-  exit
-
