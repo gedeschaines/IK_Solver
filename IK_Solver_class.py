@@ -114,6 +114,7 @@ class IK_Solver:
     self.tsolve = 0.0                     # time to solve
     self.tgo    = 0.0                     # time to goal
     self.ni     = 0                       # number of iterations
+    self.lastni = 0                       # save of last ni on done and print
     self.button = 0                       # mouse button pressed indicator
     self.X0     = np.zeros(len(self.p))   # link chain initial x coordinates 
     self.Y0     = np.zeros(len(self.p))   # link chain initial y coordinates
@@ -134,6 +135,7 @@ class IK_Solver:
     self.tsolve     = 0.0
     self.tgo        = 0.0
     self.ni         = 0
+    self.lastni     = 0
     self.button     = 0
     self.set_points_x0y0z0()
     
@@ -168,16 +170,18 @@ class IK_Solver:
     
     while icnt > 0 :
       if self.done(self.ni) :
-        print("Iteration time (sec) = %8.3f" % (self.tsolve) )
-        error = la.norm(self.ec - self.et)
-        print("Effector position error = %8.4f" % (error) )
-        if self.Plot3D == 0 :
-          theta = self.get_endeff_rot()
-          print("Effector rotation angle = %8.3f " % (theta*dpr) )
-        else :
-          (psi,theta,phi) = self.get_endeff_ypr()
-          print("Effector yaw,pitch,roll = %8.3f, %8.3f, %8.3f" % \
-                (psi*dpr, theta*dpr, phi*dpr) )
+        if self.lastni != self.ni:
+          print("Iteration time (sec) = %8.3f" % (self.tsolve) )
+          error = la.norm(self.ec - self.et)
+          print("Effector position error = %8.4f" % (error) )
+          if self.Plot3D == 0 :
+            theta = self.get_endeff_rot()
+            print("Effector rotation angle = %8.3f " % (theta*dpr) )
+          else :
+            (psi,theta,phi) = self.get_endeff_ypr()
+            print("Effector yaw,pitch,roll = %8.3f, %8.3f, %8.3f" % \
+                  (psi*dpr, theta*dpr, phi*dpr) )
+          self.lastni = self.ni  # prevent done reprint of last IK solution
         self.button = -1
         icnt        = 0
       else :
@@ -355,6 +359,7 @@ class IK_Solver:
         self.tgo = time_to_goal(self.et,self.vt,self.w,self.p,self.dq)
         #print("tgo = %8.5f" % (self.tgo) )
         # Increment iteration counters and time
+        self.lastni = self.ni
         self.ni     = self.ni + 1
         self.tsolve = self.tsolve + self.h
         icnt        = icnt - 1
