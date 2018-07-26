@@ -14,11 +14,11 @@ is required to record graphic animations.
 
 The following images and hyperlinked video clips depict the motion of two dimensional
 (2D) and three dimensional (3D) 4-link revolute joint serial chains as the end-effector moves
-from its initial position towards a moving target. Although 14 seconds (140 frames \@ 10FPS)
+from its initial position towards a moving target. Although 14 simulation seconds (140 frames \@ 10FPS)
 are shown, it takes 11.12 seconds for the 2D link chain to reaches it's target and 5.48
 seconds for the 3D link chain to reach it's target. In both cases the end-effector moves
 to a predicted intercept point along the target's path of motion. Joint rotation clamping
-and rotation rate limiting is used to provide a more realistic simulation of the link chain's
+and rotation rate limiting are utilized to provide a more realistic simulation of the link chain's
 movement.
 
 2D 4-Link Frame 0 | 2D 4-Link Frame 140
@@ -31,7 +31,7 @@ movement.
 <a href="https://youtu.be/Rj2a2JKNJ6g"><img src="./docs/images/IK_Solver_3_3D_001.jpg" alt="./docs/images/IK_Solver_3_3D_001.jpg" width="450" height="300"></a>|<a href="https://youtu.be/Rj2a2JKNJ6g"><img src="./docs/images/IK_Solver_3_3D_140.jpg" alt="./docs/images/IK_Solver_3_3D_140.jpg" width="450" height="300"></a>
 
 If animation recording is not selected, then during 2D link chain animation the user can move
-the cursor to a location in the drawing area and press the middle mouse button to interrupt
+the cursor to a location within the drawing area and press the middle mouse button to interrupt
 IK solving and place the target at the picked location. The link chain end-effector will then
 be directed toward intercepting the target as it moves from its new location. For non-recorded
 3D link chain animation, pressing the middle mouse button causes the target to move to a randomly
