@@ -23,12 +23,12 @@ movement.
 
 2D 4-Link Frame 0 | 2D 4-Link Frame 140
 ----------------- | -------------------
-<a href=""><img src="./docs/images/IK_Solver_3_2D_001.jpg" alt="./docs/images/IK_Solver_3_2D_001.jpg" width="450" height="300"></a>|<a href=""><img src="./docs/images/IK_Solver_3_2D_140.jpg" alt="./docs/images/IK_Solver_3_2D_140.jpg" width="450" height="300"></a>
+<a href="https://youtu.be/Tcd8GGE0yGY"><img src="./docs/images/IK_Solver_3_2D_001.jpg" alt="./docs/images/IK_Solver_3_2D_001.jpg" width="450" height="300"></a>|<a href="https://youtu.be/Tcd8GGE0yGY"><img src="./docs/images/IK_Solver_3_2D_140.jpg" alt="./docs/images/IK_Solver_3_2D_140.jpg" width="450" height="300"></a>
 
 
 3D 4-Link Frame 0 | 3D 4-Link Frame 140
 ----------------- | -------------------
-<a href=""><img src="./docs/images/IK_Solver_3_3D_001.jpg" alt="./docs/images/IK_Solver_3_3D_001.jpg" width="450" height="300"></a>|<a href=""><img src="./docs/images/IK_Solver_3_3D_140.jpg" alt="./docs/images/IK_Solver_3_3D_140.jpg" width="450" height="300"></a>
+<a href="https://youtu.be/Rj2a2JKNJ6g"><img src="./docs/images/IK_Solver_3_3D_001.jpg" alt="./docs/images/IK_Solver_3_3D_001.jpg" width="450" height="300"></a>|<a href="https://youtu.be/Rj2a2JKNJ6g"><img src="./docs/images/IK_Solver_3_3D_140.jpg" alt="./docs/images/IK_Solver_3_3D_140.jpg" width="450" height="300"></a>
 
 If animation recording is not selected, then during 2D link chain animation the user can move
 the cursor to a location in the drawing area and press the middle mouse button to interrupt
