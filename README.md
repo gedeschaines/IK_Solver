@@ -130,7 +130,7 @@ These reference documents are provided in the ./refs subdirectory in the event
 their associated web links are broken. For additonal reference information,
 software, demos and tutorials on physics-based animation, inverse kinematics
 and 3D computer graphics see Ben Kenwright's [XBDEV.NET](http://www.xbdev.net/index.php)
-website and Sam Buss's [Publications and Other Research](http://www.math.ucsd.edu/~sbuss/ResearchWeb/index.html) web page.
+website, Edinburgh Napier University Games Development [Resources](http://games.soc.napier.ac.uk/resources.html), and Sam Buss's [Publications and Other Research](http://www.math.ucsd.edu/~sbuss/ResearchWeb/index.html) web page.
 
 #### Disclaimers ####
 
