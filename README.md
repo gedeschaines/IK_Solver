@@ -148,7 +148,7 @@ I present the user interface of my early programming experience.
 <a href="https://youtu.be/iXLfiAvkbyg"><img src="./docs/images/Hollerith_card.jpg" alt="https://commons.wikimedia.org/wiki/File:Hollerith_card.jpg" width="526" height="236"></a>
 
 Electromechanical typing and only 80 characters; tabbing, spacing and verbose statements
-were a luxury not a necessity. And no, that's not me or my father in the YouTube
+were a luxury, not a necessity. And no, that's not me or my dad in the YouTube
 video presented when you click on the Hollerith card image.
 
 The IK_Solver program's primary role is as a simple demonstration and learning tool for
