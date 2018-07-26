@@ -607,6 +607,3 @@ if __name__ == '__main__':
       data = 'stop'
     tcpCliSock.send(data.encode())
     tcpCliSock.close()
-    
-  exit
-
