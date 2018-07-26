@@ -1,0 +1,4 @@
+temp/*
+__pycache__/*
+*.py[co]
+*~
