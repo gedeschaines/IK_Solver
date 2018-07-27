@@ -75,14 +75,24 @@ class IK_Solver:
     self.qmax     = qmax   # vector of joint maximum rotations (radians)
     self.dqlim    = dqlim  # joints delta rotation limit (radians)
     
-    self.na = len(self.a)        # number of link body attachment points
-    self.ia = self.na - 1        # index of end effector attachment point
-    self.nq = len(self.q0)       # number of link chain joints    
-    self.s  = np.zeros(self.nq)  # create array of link sizes
-    for i in range(0,self.na-1) :
+    self.na = len(self.a)         # number of link body attachment points
+    self.ia = self.na - 1         # index of end effector attachment point
+    self.nq = len(self.q0)        # number of link chain joints
+    self.s  = np.zeros(self.nq)   # create array of link sizes
+    for i in range(0,self.na-1):
       self.s[i] = la.norm(a[i+1])
+    self.efd = self.s[-1]         # size of end effector link
 
-    self.d  = np.sum(self.s)     # length of fully extended link chain
+    # generalizations used in distance checks of iteration done function;
+    # assumes joint rotation limits do not prevent a full linear extension
+    if p3d == 0:
+      self.dxy = np.sum(self.s[0:])  # length of fully extended chain in xy plane
+      self.dz  = 0.0                 # length of fully extended chain in z direction
+    else:
+      # following assumes first link strictly in the z direction
+      self.dxy = np.sum(self.s[1:])  # length of fully extended chain in xy plane
+      self.dz  = np.sum(self.s[0:])  # length of fully extended chain in z direction
+
     self.q  = self.q0            # vector of current joint rotations
     self.dq = np.zeros(self.nq)  # vector of current joint delta rotations
     
@@ -103,22 +113,22 @@ class IK_Solver:
     self.et = self.et0
     self.vt = self.vt0
     
-    self.h      = 0.04                    # IK iteration step size
-    self.ilim   = int(60.0/self.h)        # IK iteration limit for 60 seconds
-    self.sdel   = 0.001                   # PIM singularity damping constant from ref [2]
-    self.sfac   = 0.01                    # PIM singularity threshold factor from ref [3]
-    self.slam   = 1.1                     # DLS singularity damping factor from ref [3]
-    self.dH     = np.zeros(self.nq)       # null space control vector
-    self.derr   = 0.01                    # allowable effector to target distance error
-    self.perr   = atan(self.derr/self.d)  # allowable effector to target pointing error
-    self.tsolve = 0.0                     # time to solve
-    self.tgo    = 0.0                     # time to goal
-    self.ni     = 0                       # number of iterations
-    self.lastni = 0                       # save of last ni on done and print
-    self.button = 0                       # mouse button pressed indicator
-    self.X0     = np.zeros(len(self.p))   # link chain initial x coordinates 
-    self.Y0     = np.zeros(len(self.p))   # link chain initial y coordinates
-    self.Z0     = np.zeros(len(self.p))   # link chain initial y coordinates
+    self.h      = 0.04                      # IK iteration step size
+    self.ilim   = int(60.0/self.h)          # IK iteration limit for 60 seconds
+    self.sdel   = 0.001                     # PIM singularity damping constant from ref [2]
+    self.sfac   = 0.01                      # PIM singularity threshold factor from ref [3]
+    self.slam   = 1.1                       # DLS singularity damping factor from ref [3]
+    self.dH     = np.zeros(self.nq)         # null space control vector
+    self.derr   = 0.005*self.dxy            # allowable effector to target distance error
+    self.perr   = atan(self.derr/self.efd)  # allowable effector to target xy pointing error
+    self.tsolve = 0.0                       # time to solve
+    self.tgo    = 0.0                       # time to goal
+    self.ni     = 0                         # number of iterations
+    self.lastni = 0                         # save of last ni on done and print
+    self.button = 0                         # mouse button pressed indicator
+    self.X0     = np.zeros(len(self.p))     # link chain initial x coordinates
+    self.Y0     = np.zeros(len(self.p))     # link chain initial y coordinates
+    self.Z0     = np.zeros(len(self.p))     # link chain initial y coordinates
     self.set_points_x0y0z0()
   
     random.seed(987654321)
@@ -145,18 +155,21 @@ class IK_Solver:
     """
     if ni == self.ilim : return True
        
-    etp = self.et-self.p[0]    # vector from link chain base to target
-    ecp = self.ec-self.p[0]    # vector from link chain base to effector
-    det = la.norm(etp)         # distance from base to target
-    dec = la.norm(ecp)         # distance from base to effector
-    dot = np.dot(ecp,etp)/det  # portion of ecp along etp
+    etp   = self.et-self.p[0]    # vector from link chain base to target
+    ecp   = self.ec-self.p[0]    # vector from link chain base to effector
+    detxy = la.norm(etp[0:2])    # distance from base to target in xy plane
+    detz  = abs(etp[2])          # distance from base to target in z direction
+    decxy = la.norm(ecp[0:2])    # distance from base to effector in xy plane
+    dotxy = np.dot(ecp[0:2],etp[0:2])/detxy  # portion of ecp along etp in xy plane
     
-    if (det > self.d) :
-      # effector cannot possibly reach target
-      if (abs(self.d-dec) > self.derr) or \
-         (np.arccos(dot/dec) > self.perr) : return False
+    if (detxy > self.dxy) or (abs(detz-self.dz) > self.derr):
+      # target currently beyond reach of effector; but is it
+      # outside allowable distance and xy pointing error?
+      if (la.norm(self.et-self.ec) > self.derr) or \
+         (np.arccos(dotxy/decxy) > self.perr) : return False
     else :
-      # target not beyond reach of effector
+      # target currently not beyond reach of effector; but is it
+      # outside allowable distance error?
       if (la.norm(self.et-self.ec) > self.derr) : return False
     return True
     
@@ -449,7 +462,7 @@ class IK_Solver:
     X = np.array([self.et[0]])
     Y = np.array([self.et[1]])
     return (X,Y)
-    
+
   def get_target_xyz(self):
     """
     IK Solver - get current target (X,Y,Z) coordinates
@@ -458,7 +471,7 @@ class IK_Solver:
     Y = np.array([self.et[1]])
     Z = np.array([self.et[2]])
     return (X,Y,Z)
-    
+
   def get_endeff_xyz(self):
     """
     IK Solver - get current end effector (X,Y,Z) coordinates
