@@ -19,6 +19,8 @@
 #   get_points_xyz    - gets current link coordinates for 3D plots
 #   get_target_xy     - gets current target coordinates for 2D plots
 #   get_target_xyz    - gets current target coordinates for 3D plots
+#   get_predtgt_xy    - gets predicted target coordinates for 2D plots
+#   get_predtgt_xyz   - gets predicted target coordinates for 3D plots
 #   get_endeff_xyz    - gets current end effector coordinates for 3D plots
 #   get_endeff_rot    - gets current end effector rotation about its z-axis
 #   get_endeff_ypr    - gets current end effector yaw,pitch,roll rotations
@@ -112,7 +114,8 @@ class IK_Solver:
       self.vt0 = np.array([ 0.0,-0.2, 0.0])  # velocity vector
     self.et = self.et0
     self.vt = self.vt0
-    
+    self.pt = self.et0
+
     self.h      = 0.04                      # IK iteration step size
     self.ilim   = int(60.0/self.h)          # IK iteration limit for 60 seconds
     self.sdel   = 0.001                     # PIM singularity damping constant from ref [2]
@@ -140,6 +143,7 @@ class IK_Solver:
     self.ec         = self.p[self.ia]
     self.et         = self.et0
     self.vt         = self.vt0
+    self.pt         = self.et0
     self.dq         = np.zeros(self.nq)
     self.dH         = np.zeros(self.nq)
     self.tsolve     = 0.0
@@ -162,15 +166,17 @@ class IK_Solver:
     decxy = la.norm(ecp[0:2])    # distance from base to effector in xy plane
     dotxy = np.dot(ecp[0:2],etp[0:2])/detxy  # portion of ecp along etp in xy plane
     
-    if (detxy > self.dxy) or (abs(detz-self.dz) > self.derr):
+    if ((detxy - self.dxy) > self.derr) or ((detz - self.dz) > self.derr):
       # target currently beyond reach of effector; but is it
-      # outside allowable distance and xy pointing error?
-      if (la.norm(self.et-self.ec) > self.derr) or \
-         (np.arccos(dotxy/decxy) > self.perr) : return False
+      # outside allowable distance or xy pointing error?
+      if (abs(decxy - self.dxy) > self.derr) or \
+         (np.arccos(dotxy/decxy) > self.perr) :
+        return False
     else :
       # target currently not beyond reach of effector; but is it
-      # outside allowable distance error?
-      if (la.norm(self.et-self.ec) > self.derr) : return False
+      # outside allowable distance?
+      if (la.norm(self.et - self.ec) > self.derr) :
+        return False
     return True
     
   def step(self,tdel):
@@ -203,6 +209,7 @@ class IK_Solver:
           self.dq = np.zeros(self.nq)
           for i in range(self.nq-1,-1,-1) :
             pt    = self.et + self.tgo*self.vt - self.p[i]
+            # predicted target position at tgo relative to link
             npt   = la.norm(pt)
             pc    = self.ec - self.p[i]
             npc   = la.norm(pc)
@@ -216,6 +223,7 @@ class IK_Solver:
             else :
               self.dq[i] = 0.0
         else :
+          # error from effector to predicted target position at tgo
           de = self.et + self.tgo*self.vt - self.ec
           #de = self.et - self.ec
           #Jt = jacobian(self.nq,self.w,self.p,self.et+self.tgo*self.vt)
@@ -370,6 +378,7 @@ class IK_Solver:
         self.ec  = self.p[self.ia]
         self.et  = self.et + self.h*self.vt
         self.tgo = time_to_goal(self.et,self.vt,self.w,self.p,self.dq)
+        self.pt  = self.et + self.tgo * self.vt
         #print("tgo = %8.5f" % (self.tgo) )
         # Increment iteration counters and time
         self.lastni = self.ni
@@ -472,6 +481,23 @@ class IK_Solver:
     Z = np.array([self.et[2]])
     return (X,Y,Z)
 
+  def get_predtgt_xy(self):
+    """
+    IK Solver - get predicted target (X,Y) coordinates
+    """
+    X = np.array([self.pt[0]])
+    Y = np.array([self.pt[1]])
+    return (X, Y)
+
+  def get_predtgt_xyz(self):
+    """
+    IK Solver - get predicted target (X,Y,Z) coordinates
+    """
+    X = np.array([self.pt[0]])
+    Y = np.array([self.pt[1]])
+    Z = np.array([self.pt[2]])
+    return (X, Y, Z)
+
   def get_endeff_xyz(self):
     """
     IK Solver - get current end effector (X,Y,Z) coordinates
@@ -543,6 +569,7 @@ class IK_Solver:
         self.et0[1] = r*sin(theta)
         self.et0[2] = random.uniform(1,3)
       self.et     = self.et0
+      self.pt     = self.et0
       self.dq     = np.zeros(self.nq)
       self.dH     = np.zeros(self.nq)
       self.tsolve = 0.0
