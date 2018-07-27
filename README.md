@@ -4,8 +4,8 @@ IK_Solver - Inverse Kinematic Solver for n-link serial chain
 The interactive IK_Solver program graphically demonstrates implementation of
 several inverse kinematic solving techniques, as presented in the referenced documents,
 for two and three dimensional, revolute joint, n-link serial chains. The program
-is written entirely in version 2 and 3 compatible [Python](https://www.python.org/),
-and only requires [NumPy](http://www.numpy.org/) and [Matplotlib](https://matplotlib.org/)
+is written entirely in version 2 and 3 compatible [Python](https://www.python.org/)
+and requires [SciPy](https://www.scipy.org/), primarily for [NumPy](http://www.numpy.org/) and [Matplotlib](https://matplotlib.org/)
 packages. A [MATLAB](https://www.mathworks.com/products/matlab.html)/[Octave](https://www.gnu.org/software/octave/)
 script variant is also provided in the ./MATLAB subdirectory of this distribution.
 For both Python and MATLAB/Octave variants, a video encoder application, such as
