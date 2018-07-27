@@ -13,20 +13,22 @@ For both Python and MATLAB/Octave variants, a video encoder application, such as
 is required to record graphic animations.
 
 The following images and hyperlinked video clips depict the motion of two dimensional
-(2D) and three dimensional (3D) 4-link revolute joint serial chains as the end-effector moves
+(2D) and three dimensional (3D) 5-link revolute joint serial chains as the end-effector moves
 from its initial position towards a moving target. Although 14 simulation seconds (140 frames \@ 10FPS)
 are shown, it takes 11.12 seconds for the 2D link chain to reaches it's target and 5.48
 seconds for the 3D link chain to reach it's target. In both cases the end-effector moves
 to a predicted intercept point along the target's path of motion. Joint rotation clamping
 and rotation rate limiting are utilized to provide a more realistic simulation of the link chain's
-movement.
+movement. Even though only four links are apparent in the serial chains shown,
+both link chains contain two orthogonal revolute joints between the last two visible links; the
+last link considered as the end-effector.
 
-2D 4-Link Frame 0 | 2D 4-Link Frame 140
+2D 5-Link Frame 0 | 2D 5-Link Frame 140
 ----------------- | -------------------
 <a href="https://youtu.be/Tcd8GGE0yGY"><img src="./docs/images/IK_Solver_3_2D_001.jpg" alt="./docs/images/IK_Solver_3_2D_001.jpg" width="450" height="300"></a>|<a href="https://youtu.be/Tcd8GGE0yGY"><img src="./docs/images/IK_Solver_3_2D_140.jpg" alt="./docs/images/IK_Solver_3_2D_140.jpg" width="450" height="300"></a>
 
 
-3D 4-Link Frame 0 | 3D 4-Link Frame 140
+3D 5-Link Frame 0 | 3D 5-Link Frame 140
 ----------------- | -------------------
 <a href="https://youtu.be/Rj2a2JKNJ6g"><img src="./docs/images/IK_Solver_3_3D_001.jpg" alt="./docs/images/IK_Solver_3_3D_001.jpg" width="450" height="300"></a>|<a href="https://youtu.be/Rj2a2JKNJ6g"><img src="./docs/images/IK_Solver_3_3D_140.jpg" alt="./docs/images/IK_Solver_3_3D_140.jpg" width="450" height="300"></a>
 
