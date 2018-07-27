@@ -122,7 +122,7 @@ class IK_Solver:
     self.sfac   = 0.01                      # PIM singularity threshold factor from ref [3]
     self.slam   = 1.1                       # DLS singularity damping factor from ref [3]
     self.dH     = np.zeros(self.nq)         # null space control vector
-    self.derr   = 0.005*self.dxy            # allowable effector to target distance error
+    self.derr   = 0.005*self.efd            # allowable effector to target distance error
     self.perr   = atan(self.derr/self.efd)  # allowable effector to target xy pointing error
     self.tsolve = 0.0                       # time to solve
     self.tgo    = 0.0                       # time to goal
