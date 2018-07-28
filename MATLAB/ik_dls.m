@@ -6,7 +6,7 @@ function [dq] = ik_dls(J,de,slam,dqlim,phi)
 %   J     = Jacobian matrix of de/dq
 %   de    = vector of delta errors
 %   slam  = singularity damping factor
-%   dqlim = joint rotation delta limit
+%   dqlim = vector of joint rotation delta limits
 %   phi   = null space control vector
 
 [m,n]   = size(J);
@@ -19,8 +19,10 @@ Jinv  = V*(Sinv*U');
 Jprj  = eye(n) - Jinv*J;
 dq    = (Jinv*de' + Jprj*phi')';
 dqmax = max(abs(dq));
-if dqmax > dqlim
-  dq = (dqlim/dqmax)*dq;
+for i = 1:length(dq)
+  if dqmax > dqlim(i)
+    dq(i) = dq(i)*(dqlim(i)/dqmax)
+  end
 end
 
 end
