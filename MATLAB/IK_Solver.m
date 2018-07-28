@@ -12,20 +12,21 @@
 % damped least squares (DLS) [3] as detailed in the listed references.
 % The program is comprised of the following script files.
 %
-%   IK_Solver.m - main program utilizing the following functions:
-%   ik_jtm.m    - apply IK Jacobian transpose method
-%   ik_pim2.m   - apply IK pseudo-inverse method from ref [2]
-%   ik_pim3.m   - apply IK pseudo-inverse method from ref [3]
-%   ik_dls      - apply IK damped least squares technique
-%   solve_chk.m - IK solver solution check 
-%   jacobian.m  - compute Jacobian matrix
-%   rotation.m  - compute coordinate rotation matrix
-%   transform.m - transform coordinates from local to world space  
-%   clamp_rot.m - clamp joint rotations to specified limits
-%   plot_xy.m   - extract link plot x,y coordinates for 2D plotting
-%   plot_xyz.m  - extract link plot x,y,z coordinates for 3D plotting
-%   angle_chk.m - debug display of joint rotation angle checks
-%   isOctave.m  - returns true if script is being executed by Octave
+%   IK_Solver.m    - main program utilizing the following functions:
+%   ik_jtm.m       - apply IK Jacobian transpose method
+%   ik_pim2.m      - apply IK pseudo-inverse method from ref [2]
+%   ik_pim3.m      - apply IK pseudo-inverse method from ref [3]
+%   ik_dls         - apply IK damped least squares technique
+%   solve_chk.m    - IK solver solution check
+%   time_to_goal.m - time to reach target
+%   jacobian.m     - compute Jacobian matrix
+%   rotation.m     - compute coordinate rotation matrix
+%   transform.m    - transform coordinates from local to world space  
+%   clamp_rot.m    - clamp joint rotations to specified limits
+%   plot_xy.m      - extract link plot x,y coordinates for 2D plotting
+%   plot_xyz.m     - extract link plot x,y,z coordinates for 3D plotting
+%   angle_chk.m    - debug display of joint rotation angle checks
+%   isOctave.m     - returns true if script is being executed by Octave
 %
 %   The following functions are not required by MATLAB, but are used
 %   by Octave to emulate MATLAB getframe and movie2avi functions. These
@@ -67,6 +68,8 @@
 clear all
 close all
 
+more off
+
 %#ok<*NOPTS>
 
 global rpd;
@@ -85,8 +88,8 @@ n360rad = -360*rpd;
 p180rad =  180*rpd;
 n180rad = -180*rpd;
 
-Plot3D = 1;  % plot in 3D flag
-Record = 1;  % record movie flag (*** Not Functional with Octave)
+Plot3D = 0;  % plot in 3D flag
+Record = 0;  % record movie flag (*** Not Functional with Octave)
 
 UseCCD   = 1;  % use cyclic coordinate descent
 UseJTM   = 2;  % use jacobian transpose method
@@ -127,6 +130,7 @@ else
   display(sprintf('  + left to randomly locate target'));
 end
 display(sprintf('  + right to stop the IK solver'));
+display(sprintf('Wait until program exits to close plot window.'));
 
 % Jointed N-Link Chain Pictogram
 %                                                                 +    
@@ -163,30 +167,36 @@ if Plot3D == 0
             135*rpd,...   % <- joint 2 |
              60*rpd,...   % <- joint 3 |
              60*rpd];     % <- joitn 4 /
-  dqlim =   10.0*rpd;     % joint delta rotation limit
+  dqlim = [  30*rpd,...   % <- joint 1 + joint delta rotation limit (rad/sec)
+             30*rpd,...   % <- joint 2 |
+             30*rpd,...   % <- joint 3 |
+             30*rpd];     % <- joitn 4 /
 else
   a = {[0.0,0.0,0.0],...  % <- joint 1 + set of link chain attachment
        [0.0,0.0,2.0],...  % <- joint 2 | points in body coordinates,
        [2.0,0.0,0.0],...  % <- joint 3 | except for the base given in 
        [2.0,0.0,0.0],...  % <- joint 4 / world space coordinates
-       [1.0,0.0,0.0]};    % <- end effector
+       [0.5,0.0,0.0]};    % <- end effector
   u = {[0.0,0.0,1.0],...  % <- joint 1 + set of joint rotation axis unit
        [0.0,1.0,0.0],...  % <- joint 2 | vectors in link body coordinates
        [0.0,1.0,0.0],...  % <- joint 3 | 
        [0.0,1.0,0.0]};    % <- joint 4 /
-  q0    = [  45*rpd,...   % <- joint 1 + initial joint rotations (radians)
-             25*rpd,...   % <- joint 2 |
-            -25*rpd,...   % <- joint 3 |
-             10*rpd];     % <- joint 4 /
+  q0    = [   0*rpd,...   % <- joint 1 + initial joint rotations (radians)
+            -45*rpd,...   % <- joint 2 |
+             45*rpd,...   % <- joint 3 |
+              0*rpd];     % <- joint 4 /
   qmin  = [-360*rpd,...   % <- joint 1 + joint minimum rotations (radians)
            -135*rpd,...   % <- joint 2 |
            -130*rpd,...   % <- joint 3 |
-            -60*rpd];     % <- joint 4 /
+            -85*rpd];     % <- joint 4 /
   qmax  = [ 360*rpd,...   % <- joint 1 + joint maximum rotations (radians)
             135*rpd,...   % <- joint 2 |
             135*rpd,...   % <- joint 3 |
-             60*rpd];     % <- joitn 4 /
-  dqlim =   10.0*rpd;     % joint delta rotation limit   
+             85*rpd];     % <- joitn 4 /
+  dqlim = [  30*rpd,...   % <- joint 1 + joint delta rotation limit (rad/sec)
+             30*rpd,...   % <- joint 2 |
+             30*rpd,...   % <- joint 3 |
+             30*rpd];     % <- joitn 4 /
 end
 na = length(a);   % number of link body attachment points
 np = na;          % number of link attachment world positions
@@ -195,25 +205,46 @@ s = zeros(1,nq);  % create array of link sizes
 for i = 1 : na-1
   s(i) = norm(a{i+1});
 end
+efd = s(end);     % size of end effector link
 
-d     = sum(s);               % length of fully extended link chain
+% generalizations used in distance checks of iteration solve_chk function;
+% assumes joint rotation limits do not prevent a full linear extension.
+if Plot3D == 0
+  dxy = sum(s(1:end));  % length of fully extended chain in xy plane
+  dz  = 0.0;            % length of fully extended chain in z direction
+else
+  % following assumes first link strictly in the z direction
+  dxy = sum(s(2:end));  % length of fully extended chain in xy plane
+  dz  = sum(s(1:end));  % length of fully extended chain in z direction
+end
+
 q     = q0;                   % vector of current joint rotations
 [p,w] = transform(na,q,u,a);  % joint positions/rotations in world space
 ec    = p{na};                % end effector current position vector
-et    = [ 0.0, 4.0, 0.0];     % end effector target position vector
-vt    = [ 0.0, 0.0, 0.0];     % target velocity vector
+
+# specify end effector target position and velocity
+if Plot3D == 0
+  et = [ 3.0, 4.0, 0.0];  % end effector target position vector
+  vt = [-0.1, 0.0, 0.0];  % target velocity vector
+else
+  et = [ 3.0, 3.0, 2.0];  % end effector target position vector
+  vt = [ 0.0,-0.2, 0.0];  % target velocity vector
+end
+
+pt    = et;                   % predicted target intercept position vector
 h     = 0.04;                 % IK iteration step size
 FPS   = 10;                   % IK animation frame rate
 kfps  = round((1/FPS)/h);     % IK iteration count per frame for FPS rate
-ilim  = round(30/h);          % IK iteration limit for 10 seconds
+ilim  = round(30/h);          % IK iteration limit for 30 seconds
 ni    = 0;                    % iteration counter
 tsim  = 0.0;                  % simulation time (sec)
+tgo   = h;                    % time to goal (sec)
 sdel  = 0.001;                % PIM singularity damping constant from ref [2]
 sfac  = 0.01;                 % PIM singularity threshold factor from ref [3]
 slam  = 1.1;                  % DLS singularity damping factor from ref [3]
 dH    = zeros(1,nq);          % null space control vector
-derr  = 0.02*d;               % allowable effector to target distance error
-perr  = atan(derr/d);         % allowable effector to target pointing error
+derr  = 0.04*efd;             % allowable effector to target distance error
+perr  = atan(derr/efd);       % allowable effector to target pointing error
 
 text_tsim = @(t){ sprintf('time = %.3f', t) };
 lw = 'linewidth';
@@ -221,8 +252,9 @@ lw = 'linewidth';
 fig1 = figure('Name',title,'NumberTitle','Off');
 if Plot3D == 0
   [X0,Y0] = plot_xy(np,p);
-  plot([X0(na),et(1)],[Y0(na),et(2)],...
-        X0,Y0,'-og', et(1),et(2),' *r');
+  plot([X0(na),et(1)],[Y0(na),et(2)], ...
+        X0,Y0,'-og', ...
+        pt(1),pt(2),' *m', et(1),et(2),' *r');
    xlabel('X');ylabel('Y');
   axis([-6 6 -6 6]);
   axis square;
@@ -231,7 +263,8 @@ if Plot3D == 0
 else
   et = [4.0, 0.0, 2.0];
   [X0,Y0,Z0] = plot_xyz(np,p);
-  plot3(X0,Y0,Z0,'-og', et(1),et(2),et(3),' *r');
+  plot3(X0,Y0,Z0,'-og',  ...
+        pt(1),pt(2),pt(3),' *m', et(1),et(2),et(3),' *r');
   xlabel('X');ylabel('Y');zlabel('Z');
   axis([-5 5 -5 5  0 5]);
   text_x = -9.0;
@@ -274,22 +307,22 @@ end
 button = 1;
 while button == 1
   ik = 1;  % iteration count till next plot update
-  while solve_chk(ni,ilim,p,ec,et,d,derr,perr) == 0
+  while solve_chk(ni,ilim,p,ec,et,dxy,dz,derr,perr) == 0
     % Calculate IK solution
     if IKmethod == UseCCD
       dq = zeros(1,nq);
       for i = nq:-1:1
-        pt    = et - p{i};
+        pt    = et + tgo*vt - p{i};
         npt   = norm(pt);
         pc    = ec - p{i};
         npc   = norm(pc);
         ut    = cross(cross(w{i},pc/npc), cross(w{i},pt/npt));
         ut    = ut/norm(ut);
-        dqmax = min([acos((pt*(pc/npc)')/norm(pt)),dqlim]);
+        dqmax = min([acos((pt*(pc/npc)')/norm(pt)),dqlim(i)]);
         dq(i) = dqmax*(ut*(w{i})');
       end
     else
-      de = et - ec;
+      de = et + tgo*vt - ec;
       % Jt = jacobian(nq,w,p,et);
       Jc = jacobian(nq,w,p,ec);
       J  = Jc;
@@ -310,8 +343,10 @@ while button == 1
     [p,w] = transform(na,q,u,a);
     %angle_chk(q,u,p,et);
     % Update end effector current and target positions
-    ec = p{na};
-    et = et + h*vt;
+    ec  = p{na};
+    et  = et + h*vt;
+    tgo = time_to_goal(et,vt,w,p,dq);
+    pt  = et + tgo*vt;
     % Increment iteration and simulation time counters
     ni   = ni + 1;
     tsim = tsim + h;
@@ -320,11 +355,13 @@ while button == 1
     if ik == 0
       if Plot3D == 0
         [X,Y] = plot_xy(np,p);
-        plot([X0(na),et(1)],[Y0(na),et(2)],' -k',...
-              X0,Y0,'-og', X,Y,'-ob',lw,2, et(1),et(2),' *r');
+        plot([X0(na),pt(1)],[Y0(na),pt(2)],' -k', ...
+              X0,Y0,'-og', X,Y,'-ob',lw,2, ...
+              et(1),et(2),' *r',  pt(1),pt(2),' *m');
       else
         [X,Y,Z] = plot_xyz(np,p);  
-        plot3(X0,Y0,Z0,'-og', X,Y,Z,'-ob',lw,2, et(1),et(2),et(3),' *r');
+        plot3(X0,Y0,Z0,'-og', X,Y,Z,'-ob',lw,2, ...
+              et(1),et(2),et(3),' *r', pt(1),pt(2),pt(3),' *m');
       end
       text(text_x,text_y,text_tsim(tsim),'fontweight','bold');
       drawnow;
@@ -341,7 +378,9 @@ while button == 1
   end % end of IK iteration loop 
   
   % Display solution time and plot 
-  display(sprintf('Iteration time (sec) = %8.3f',tsim));
+  error = norm(ec - et);
+  display(sprintf('Iteration time (sec) = %8.3f\nEffector position error = %8.4f',...
+                  tsim, error));
   if Plot3D == 0
     [X,Y] = plot_xy(np,p);
     plot([X0(na),et(1)],[Y0(na),et(2)],' -k',...
@@ -365,8 +404,8 @@ while button == 1
   % Wait for button press
   [Xm,Ym,button] = ginput(1);
   if Plot3D == 0
-    et(1) = Xm;
-    et(2) = Ym;
+    et(1) = min(max(Xm,-6),6);
+    et(2) = min(max(Ym,-6),6);
     et(3) = 0;
   else
     theta = 2*pi*rand;
@@ -375,9 +414,11 @@ while button == 1
     et(2) = r*sin(theta);
     et(3) = 1 + 4*rand;
   end
+  pt = et;
   % Reset iteration counter and simulation time
   ni   = 0;
   tsim = 0.0;
+  tgo  = h;
 end % end of button press loop
 
 %% Animation playback
