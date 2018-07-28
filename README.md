@@ -88,7 +88,7 @@ as a single executable program, or as client/server programs.
 The n-link chain is defined in the IK_Solver_nlink.py file using displacement and
 rotation direction vectors, and not with Denavit-Hartenberg (DH) parameters. The
 target's initial position and fixed velocity are hard-coded within animate2D and
-animated3D functions in IK_Solver.py, and as IK_solver class attributes et0
+animate3D functions in IK_Solver.py, and as IK_solver class attributes et0
 and vt0 respectively in the IK_Solver_class.py file. For a 2D case, the pseudo-inverse
 null space is used to coerce the orienation of the end-effector link segment to be
 pointing in the +X direction for the PIM3 and DLS methods. Similarly for the 3D case,
