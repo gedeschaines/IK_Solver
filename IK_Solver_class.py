@@ -86,7 +86,7 @@ class IK_Solver:
     self.efd = self.s[-1]         # size of end effector link
 
     # generalizations used in distance checks of iteration done function;
-    # assumes joint rotation limits do not prevent a full linear extension
+    # assumes joint rotation limits do not prevent a full linear extension.
     if p3d == 0:
       self.dxy = np.sum(self.s[0:])  # length of fully extended chain in xy plane
       self.dz  = 0.0                 # length of fully extended chain in z direction
@@ -117,15 +117,15 @@ class IK_Solver:
     self.pt = self.et0
 
     self.h      = 0.04                      # IK iteration step size
-    self.ilim   = int(60.0/self.h)          # IK iteration limit for 60 seconds
+    self.ilim   = int(30.0/self.h)          # IK iteration limit for 30 seconds
     self.sdel   = 0.001                     # PIM singularity damping constant from ref [2]
     self.sfac   = 0.01                      # PIM singularity threshold factor from ref [3]
     self.slam   = 1.1                       # DLS singularity damping factor from ref [3]
     self.dH     = np.zeros(self.nq)         # null space control vector
-    self.derr   = 0.005*self.efd            # allowable effector to target distance error
+    self.derr   = 0.04*self.efd             # allowable effector to target distance error
     self.perr   = atan(self.derr/self.efd)  # allowable effector to target xy pointing error
     self.tsolve = 0.0                       # time to solve
-    self.tgo    = 0.0                       # time to goal
+    self.tgo    = self.h                    # time to goal
     self.ni     = 0                         # number of iterations
     self.lastni = 0                         # save of last ni on done and print
     self.button = 0                         # mouse button pressed indicator
@@ -147,7 +147,7 @@ class IK_Solver:
     self.dq         = np.zeros(self.nq)
     self.dH         = np.zeros(self.nq)
     self.tsolve     = 0.0
-    self.tgo        = 0.0
+    self.tgo        = self.h
     self.ni         = 0
     self.lastni     = 0
     self.button     = 0
@@ -379,7 +379,6 @@ class IK_Solver:
         self.et  = self.et + self.h*self.vt
         self.tgo = time_to_goal(self.et,self.vt,self.w,self.p,self.dq)
         self.pt  = self.et + self.tgo * self.vt
-        #print("tgo = %8.5f" % (self.tgo) )
         # Increment iteration counters and time
         self.lastni = self.ni
         self.ni     = self.ni + 1
@@ -573,7 +572,7 @@ class IK_Solver:
       self.dq     = np.zeros(self.nq)
       self.dH     = np.zeros(self.nq)
       self.tsolve = 0.0
-      self.tgo    = 0.0
+      self.tgo    = self.h
       self.ni     = 0
       self.set_points_x0y0z0()
       
