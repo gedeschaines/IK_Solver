@@ -13,25 +13,25 @@ For both Python and MATLAB/Octave variants, a video encoder application, such as
 is required to record graphic animations.
 
 The following images and hyperlinked video clips depict the motion of two dimensional
-(2D) and three dimensional (3D) five revolute joint, 4-link serial chains as the end-effector
-moves from its initial position towards a moving target. Although 14 simulation seconds
-(140 frames \@ 10FPS) are shown, it takes 11.12 seconds for the 2D link chain to reaches
-it's target and 5.48 seconds for the 3D link chain to reach it's target. In both cases the
-end-effector moves to a predicted intercept point along the target's path of motion. Joint
-rotation clamping and rotation rate limiting are utilized to provide a more realistic
-simulation of the link chain's movement. Even though only four links are apparent in the
-serial chains shown, both actually have five links. A zero length link separates two
-orthogonal revolute joints between the last two visible links; the last link considered
-as the end-effector.
+(2D) and three dimensional (3D) five revolute joint, 4-link serial chains (blue line)
+as the end-effector moves from its initial position (green line) towards a moving target
+(red x). Although 14 simulation seconds (140 frames \@ 10FPS) are shown, it only took
+2.8 and 5.44 seconds for the 2D and 3D link chains respectively to reach the target. In
+both cases the end-effector moves to a predicted intercept point (magenta x) along the
+target's path of motion. Joint rotation clamping and rotation rate limiting are utilized
+to provide a more realistic simulation of the link chain's movement. Even though only
+four links are apparent in the serial chains shown, both actually have five links. A
+zero length link separates two orthogonal revolute joints between the last two visible
+links; the last link considered as the end-effector.
 
 2D 4-Link Frame 0 | 2D 4-Link Frame 140
 ----------------- | -------------------
-<a href="https://youtu.be/Tcd8GGE0yGY"><img src="./docs/images/IK_Solver_3_2D_001.jpg" alt="./docs/images/IK_Solver_3_2D_001.jpg" width="450" height="300"></a>|<a href="https://youtu.be/Tcd8GGE0yGY"><img src="./docs/images/IK_Solver_3_2D_140.jpg" alt="./docs/images/IK_Solver_3_2D_140.jpg" width="450" height="300"></a>
+<a href="https://youtu.be/sq-0xBLivSs"><img src="./docs/images/IK_Solver_3_2D_001.jpg" alt="./docs/images/IK_Solver_3_2D_001.jpg" width="450" height="300"></a>|<a href="https://youtu.be/sq-0xBLivSs"><img src="./docs/images/IK_Solver_3_2D_140.jpg" alt="./docs/images/IK_Solver_3_2D_140.jpg" width="450" height="300"></a>
 
 
 3D 4-Link Frame 0 | 3D 4-Link Frame 140
 ----------------- | -------------------
-<a href="https://youtu.be/Rj2a2JKNJ6g"><img src="./docs/images/IK_Solver_3_3D_001.jpg" alt="./docs/images/IK_Solver_3_3D_001.jpg" width="450" height="300"></a>|<a href="https://youtu.be/Rj2a2JKNJ6g"><img src="./docs/images/IK_Solver_3_3D_140.jpg" alt="./docs/images/IK_Solver_3_3D_140.jpg" width="450" height="300"></a>
+<a href="https://youtu.be/jTY7AMPonIs"><img src="./docs/images/IK_Solver_3_3D_001.jpg" alt="./docs/images/IK_Solver_3_3D_001.jpg" width="450" height="300"></a>|<a href="https://youtu.be/jTY7AMPonIs"><img src="./docs/images/IK_Solver_3_3D_140.jpg" alt="./docs/images/IK_Solver_3_3D_140.jpg" width="450" height="300"></a>
 
 If animation recording is not selected, then during 2D link chain animation the user can move
 the cursor to a location within the drawing area and press the middle mouse button to interrupt
@@ -41,9 +41,9 @@ be directed toward intercepting the target as it moves from its new location. Fo
 generated position -- left and right button presses combined with mouse motion will rotate, zoom
 and pan the 3D view space as determined by the Matplotlib figure manager and backend renderer.
 IK solving and link chain animation will stop when one of the following conditions occurs:
-1) the end-effector reaches the target,
+1) the end-effector reaches the target (within 4% of the effector's length),
 2) it's determined the end-effector cannot reach the target, or
-3) 60 seconds has elapsed.
+3) 30 seconds has elapsed.
 
 Closing the graphic animation window will terminate processing and the program will exit.
 
@@ -85,13 +85,13 @@ as a single executable program, or as client/server programs.
    where the command line arguments are the same as those presented
    above for the single executable program.
 
-The n-link chain is defined in the IK_Solver_nlink.py file, and the
-target's position and velocity are hard-coded in the IK_Solver_class.py
-file. For a 2D case, the pseudo-inverse null space is used to coerce
-the orienation of the end-effector link segment to be pointing in the
-+X direction for the PIM3 and DLS methods. Similarly for the 3D case,
-the null space is used to coerce the end-effector link segment to be
-pointing in the +X direction.
+The n-link chain is defined in the IK_Solver_nlink.py file using displacement and
+rotation direction vectors, and not with Denavit-Hartenberg (DH) parameters. The
+target's initial position and fixed velocity are hard-coded in the IK_Solver_class.py
+file. For a 2D case, the pseudo-inverse null space is used to coerce the orienation
+of the end-effector link segment to be pointing in the +X direction for the PIM3 and
+DLS methods. Similarly for the 3D case, the null space is used to coerce the
+end-effector link segment to be pointing in the +X direction.
 
 The utility of the IK_Solver client/server configuration will become apparent
 when it's revealed how IK_Solver can be used to drive an IK skeleton rigged
@@ -106,6 +106,10 @@ could be assembled from the sequence of saved images as a post-process.
 * The name and location of the saved video file is not currently a user specifiable option.
 * Instead of the target velocity being hard coded, it could be generated by a
 parametric function or read from a trajectory file.
+* Animation functions in IK_Solver.py and IK_Solver_client.py could be consolidated
+into a class to eliminate duplicative code.
+* Enhancements to target intercept prediction could include earliest possible intercept,
+and smoothing and filtering to reduce prediction error.
 * Python logging could be used instead of verbose print statements
 being manually uncommented/commented for debug, test and operational phases
 of the program's development and maintenance.
