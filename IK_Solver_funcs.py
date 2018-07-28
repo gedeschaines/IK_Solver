@@ -200,7 +200,7 @@ def ik_pim3(J,de,sfac,dqlim,phi):
   """
   try:
     U,s,Vh = la.svd(J, full_matrices=True)  # NOTE: Vh here is V' in MATLAB
-  except LinAlgError :
+  except la.LinAlgError :
     print("SVD computation does not converge.")
     
   (m,n) = J.shape
@@ -240,7 +240,7 @@ def ik_dls(J,de,slam,dqlim,phi):
   """
   try:
     U,s,Vh = la.svd(J,full_matrices=True)  # NOTE: Vh here is V' in MATLAB
-  except LinAlgError :
+  except la.LinAlgError :
     print("SVD computation does not converge.")
     
   (m,n) = J.shape
@@ -290,7 +290,7 @@ def clamp_rot(n,r,rmin,rmax):
 
 def time_to_goal(pt,vt,w,p,dq):
   """
-  function [avel] = time_to_goal(pt,vt,w,p,dq) : returns estimated time for
+  function [tgo] = time_to_goal(pt,vt,w,p,dq) : returns estimated time for
                                                  end-effector to reach the 
                                                  target goal
     pt = current position of target in world space
@@ -312,7 +312,8 @@ def time_to_goal(pt,vt,w,p,dq):
   if nrmp > 0.0 :
     vecn = vecp/nrmp
     tgo  = nrmp/(np.dot(ve-vt,vecn))
-    if tgo < 0.0 : tgo = 0.0
+    if tgo < 0.0 :
+      tgo = 0.0
   else :
     tgo = 0.0
   return tgo
@@ -333,10 +334,10 @@ def avelT_wrt_jointm(pt,vt,w,p,dq,m):
   """
   try :
     assert m-1 in range(len(dq)), 'value of m-1 not in range(len(dq))' 
-  except (AssertionError, args) :
-    ename = args.__class__.__name__
+  except AssertionError as err :
+    ename = err.__class__.__name__
     fname = 'avelT_wrt_jointm'
-    print("%s in %s: %s" % (ename, fname, args) )
+    print("%s in %s: %s" % (ename, fname, err) )
     sys.exit()
     
   n  = len(dq)
@@ -368,10 +369,10 @@ def avelE_wrt_jointm(w,p,dq,m):
   """
   try :
     assert m-1 in range(len(dq)), 'value of m-1 not in range(len(dq))' 
-  except (AssertionError, args) :
-    ename = args.__class__.__name__
+  except AssertionError as err :
+    ename = err.__class__.__name__
     fname = 'avelE_wrt_jointm'
-    print("%s in %s: %s" % (ename, fname, args) )
+    print("%s in %s: %s" % (ename, fname, err) )
     sys.exit()
     
   n  = len(dq)
@@ -423,4 +424,3 @@ def angle_chk(q,u,p,et):
   atI = np.arccos(np.dot(ept,ux)/npt)*dpr
   print("angle to target from joint %1d x-axis          = %12.6f" % (n,at3) )
   print("angle to target from inertial x-axis         = %12.6f" % (atI) )
-
