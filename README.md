@@ -147,7 +147,7 @@ website, Edinburgh Napier University Games Development [Resources](http://games.
 
 Python purists and the omnipotent PEP 8 style and naming conventions enforcement
 agents will no doubt take extreme umbrage to the IK_Solver program source code.
-To those grown reliant on using IDEs with GUIs, editors with color and layout
+For those grown accustomed to using IDEs with GUIs, editors with color and layout
 schemes, automated code inspection and refactoring, computers with wide screen
 high-def monitors, gigabytes of memory and storage, and gigahertz CPUs/GPUs,
 I present the user interface of my early programming experience.
