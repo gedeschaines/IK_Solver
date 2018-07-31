@@ -89,7 +89,7 @@ p180rad =  180*rpd;
 n180rad = -180*rpd;
 
 Plot3D = 0;  % plot in 3D flag
-Record = 0;  % record movie flag (*** Not Functional with Octave)
+Record = 0;  % record movie flag
 
 UseCCD   = 1;  % use cyclic coordinate descent
 UseJTM   = 2;  % use jacobian transpose method
@@ -295,7 +295,7 @@ if Record == 1
   end
 end
 
-% Seed random number generator.
+% Seed random number generator. (For run reproducibility)
 if isOctave
   rand ("seed", 987654321);  % Octave
 else
