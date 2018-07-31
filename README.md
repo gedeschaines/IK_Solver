@@ -6,9 +6,9 @@ several inverse kinematic solving techniques, as presented in the referenced doc
 for two and three dimensional, revolute joint, n-link serial chains. The program
 is written entirely in version 2 and 3 compatible [Python](https://www.python.org/)
 and requires [SciPy](https://www.scipy.org/), primarily for [NumPy](http://www.numpy.org/) and [Matplotlib](https://matplotlib.org/)
-packages. A [MATLAB](https://www.mathworks.com/products/matlab.html)/[Octave](https://www.gnu.org/software/octave/)
+packages. A [MATLAB<sup>&reg;</sup>](https://www.mathworks.com/products/matlab.html)/[Octave](https://www.gnu.org/software/octave/)
 script variant is also provided in the ./MATLAB subdirectory of this distribution.
-For both Python and MATLAB/Octave variants, a video encoder application, such as
+For both Python and MATLAB<sup>&reg;</sup>/Octave variants, a video encoder application, such as
 [ffmeg](https://ffmpeg.org/) or avconv from [Libav](https://libav.org/about/),
 is required to record graphic animations.
 
