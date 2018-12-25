@@ -26,7 +26,7 @@ dq    = (Jinv*de' + Jprj*phi')';
 dqmax = max(abs(dq));
 for i = 1:length(dq)
   if dqmax > dqlim(i)
-    dq(i) = dq(i)*(dqlim(i)/dqmax)
+    dq(i) = dq(i)*(dqlim(i)/dqmax);
   end
 end
 
