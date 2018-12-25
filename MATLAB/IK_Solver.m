@@ -88,7 +88,7 @@ n360rad = -360*rpd;
 p180rad =  180*rpd;
 n180rad = -180*rpd;
 
-Plot3D = 1;  % plot in 3D flag
+Plot3D = 0;  % plot in 3D flag
 Record = 0;  % record movie flag
 
 UseCCD   = 1;  % use cyclic coordinate descent
