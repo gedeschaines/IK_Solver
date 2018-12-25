@@ -263,10 +263,12 @@ if Plot3D == 0
 else
   et = [4.0, 0.0, 2.0];
   [X0,Y0,Z0] = plot_xyz(np,p);
+  ViewAz = 45.0;
+  ViewEl = 45.0;
   plot3(X0,Y0,Z0,'-og', ...
         pt(1),pt(2),pt(3),' *m', et(1),et(2),et(3),' *r');
-  view(45.0,45.0);
-  View3D = view();  
+  view(ViewAz,ViewEl);
+  [ViewAz,ViewEl] = view();
   xlabel('X');ylabel('Y');zlabel('Z');
   axis([-5 5 -5 5  0 5]);
   text_x =  8.0;
@@ -362,10 +364,10 @@ while button == 1
               et(1),et(2),' *r',  pt(1),pt(2),' *m', lw,2);
       else
         [X,Y,Z] = plot_xyz(np,p);
-        View3D = view();
+        [ViewAz,ViewEl] = view();
         plot3(X0,Y0,Z0,'-og', X,Y,Z,'-ob', ...
               et(1),et(2),et(3),' *r', pt(1),pt(2),pt(3),' *m', lw,2);
-        view(View3D);
+        view(ViewAz,ViewEl);
       end
       text(text_x,text_y,text_tsim(tsim),'fontweight','bold');
       drawnow;
@@ -392,9 +394,9 @@ while button == 1
     X0 = X; Y0 = Y;
   else  
     [X,Y,Z] = plot_xyz(np,p);
-    View3D = view();
+    [ViewAz,ViewEl] = view();
     plot3(X0,Y0,Z0,'-og', X,Y,Z,'-ob', et(1),et(2),et(3),' *r', lw,2);
-    view(View3D)
+    view(ViewAz,ViewEl)
     X0 = X; Y0 = Y; Z0 = Z;
   end
   text(text_x,text_y,text_tsim(tsim),'fontweight','bold');
