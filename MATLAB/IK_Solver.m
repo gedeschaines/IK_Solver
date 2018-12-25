@@ -88,7 +88,7 @@ n360rad = -360*rpd;
 p180rad =  180*rpd;
 n180rad = -180*rpd;
 
-Plot3D = 0;  % plot in 3D flag
+Plot3D = 1;  % plot in 3D flag
 Record = 0;  % record movie flag
 
 UseCCD   = 1;  % use cyclic coordinate descent
@@ -299,11 +299,24 @@ if Record == 1
   end
 end
 
-% Seed random number generator. (For run reproducibility)
-if isOctave
-  rand ("seed", 987654321);  % Octave
-else
-  rng(987654321);            % Matlab
+% Load random number sequence. (For run reproducibility)
+if Plot3D > 0
+  nnum = 0;
+  if exist("rnum.mat", 'file')
+    load("rnum.mat", "rnum");
+    nnum = length(rnum);
+  end
+  if nnum == 0
+    nnum = 100;
+    if isOctave
+      rand ("seed", 987654321);  % Octave
+      rnum = rand(nnum,1);
+    else
+      rng(987654321);            % Matlab
+      rnum = rand(nnum,1);
+    end
+  end
+  inum = 0;
 end
 
 %% Main loop over IK solutions
@@ -322,8 +335,8 @@ while button == 1
         npc   = norm(pc);
         ut    = cross(cross(w{i},pc/npc), cross(w{i},pt/npt));
         ut    = ut/norm(ut);
-        dqmax = min([acos((pt*(pc/npc)')/norm(pt)),dqlim(i)]);
-        dq(i) = dqmax*(ut*(w{i})');
+        dqmax = min([acos((pt*(pc/npc).')/norm(pt)),dqlim(i)]);
+        dq(i) = dqmax*(ut*(w{i}).');
       end
     else
       de = et + tgo*vt - ec;
@@ -416,12 +429,15 @@ while button == 1
     et(2) = min(max(Ym,-6),6);
     et(3) = 0;
   else
-    rnum  = rand;
-    theta = 2*pi*rnum;
-    r     = 1.5 + 3*rnum;
+    inum = inum + 1;
+    if inum > nnum 
+      inum = 1;
+    end
+    theta = 2*pi*rnum(inum);
+    r     = 1.5 + 2.5*rnum(inum);
     et(1) = r*cos(theta);
     et(2) = r*sin(theta);
-    et(3) = 1 + 4*rnum;
+    et(3) = 1 + 4*rnum(inum);
   end
   pt = et;
   % Reset iteration counter and simulation time
