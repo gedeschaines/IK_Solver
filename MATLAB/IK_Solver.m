@@ -65,7 +65,7 @@
 %
 % See IK_Solver/DISCLAIMER
 
-clear all
+clear variables
 close all
 
 more off
@@ -118,19 +118,19 @@ while IKmethod == 0
       title = 'IK_Solver - Using Damped Least Squares [ref 3]';
       IKmethod = UseDLS;
     otherwise
-      display('Invalid entry');
+      fprintf('Invalid entry\n');
       IKmethod = 0;
   end
 end
-display(sprintf('%s',title));
-display(sprintf('On the plot, use the mouse buttons:'));
+fprintf('%s\n',title);
+fprintf('On the plot, use the mouse buttons:\n');
 if Plot3D == 0
-  display(sprintf('  + left to select target location'));
+  fprintf('  + left to select target location\n');
 else
-  display(sprintf('  + left to randomly locate target'));
+  fprintf('  + left to randomly locate target\n');
 end
-display(sprintf('  + right to stop the IK solver'));
-display(sprintf('Wait until program exits to close plot window.'));
+fprintf('  + right to stop the IK solver\n');
+fprintf('Wait until program exits to close plot window.\n');
 
 % Jointed N-Link Chain Pictogram
 %                                                                 +    
@@ -222,7 +222,7 @@ q     = q0;                   % vector of current joint rotations
 [p,w] = transform(na,q,u,a);  % joint positions/rotations in world space
 ec    = p{na};                % end effector current position vector
 
-# specify end effector target position and velocity
+% specify end effector target position and velocity
 if Plot3D == 0
   et = [ 3.0, 4.0, 0.0];  % end effector target position vector
   vt = [-0.1, 0.0, 0.0];  % target velocity vector
@@ -247,15 +247,15 @@ derr  = 0.04*efd;             % allowable effector to target distance error
 perr  = atan(derr/efd);       % allowable effector to target pointing error
 
 text_tsim = @(t){ sprintf('time = %.3f', t) };
-lw = 'linewidth';
 
+lw = 'linewidth';
 fig1 = figure('Name',title,'NumberTitle','Off');
 if Plot3D == 0
   [X0,Y0] = plot_xy(np,p);
   plot([X0(na),et(1)],[Y0(na),et(2)], ...
         X0,Y0,'-og', ...
         pt(1),pt(2),' *m', et(1),et(2),' *r');
-   xlabel('X');ylabel('Y');
+  xlabel('X');ylabel('Y');
   axis([-6 6 -6 6]);
   axis square;
   text_x = -6.0;
@@ -263,12 +263,14 @@ if Plot3D == 0
 else
   et = [4.0, 0.0, 2.0];
   [X0,Y0,Z0] = plot_xyz(np,p);
-  plot3(X0,Y0,Z0,'-og',  ...
+  plot3(X0,Y0,Z0,'-og', ...
         pt(1),pt(2),pt(3),' *m', et(1),et(2),et(3),' *r');
+  view(45.0,45.0);
+  View3D = view();  
   xlabel('X');ylabel('Y');zlabel('Z');
   axis([-5 5 -5 5  0 5]);
-  text_x = -9.0;
-  text_y =  3.0;
+  text_x =  8.0;
+  text_y = -2.0;
 end
 grid on;
 hold on;
@@ -278,12 +280,12 @@ drawnow;
 
 FMT = "jpg";  % Set to "png" or "jpg"
 if Record == 1
-  if ~exist("./images")
+  if ~exist("./images", 'dir')
     mkdir("./images");
   end
   if isOctave
     sdir = ["./images/", FMT, "s"];
-    if ~exist(sdir)
+    if ~exist(sdir, 'dir')
       mkdir(sdir);
     end
   end
@@ -356,12 +358,14 @@ while button == 1
       if Plot3D == 0
         [X,Y] = plot_xy(np,p);
         plot([X0(na),pt(1)],[Y0(na),pt(2)],' -k', ...
-              X0,Y0,'-og', X,Y,'-ob',lw,2, ...
-              et(1),et(2),' *r',  pt(1),pt(2),' *m');
+              X0,Y0,'-og', X,Y,'-ob', ...
+              et(1),et(2),' *r',  pt(1),pt(2),' *m', lw,2);
       else
-        [X,Y,Z] = plot_xyz(np,p);  
-        plot3(X0,Y0,Z0,'-og', X,Y,Z,'-ob',lw,2, ...
-              et(1),et(2),et(3),' *r', pt(1),pt(2),pt(3),' *m');
+        [X,Y,Z] = plot_xyz(np,p);
+        View3D = view();
+        plot3(X0,Y0,Z0,'-og', X,Y,Z,'-ob', ...
+              et(1),et(2),et(3),' *r', pt(1),pt(2),pt(3),' *m', lw,2);
+        view(View3D);
       end
       text(text_x,text_y,text_tsim(tsim),'fontweight','bold');
       drawnow;
@@ -379,16 +383,18 @@ while button == 1
   
   % Display solution time and plot 
   error = norm(ec - et);
-  display(sprintf('Iteration time (sec) = %8.3f\nEffector position error = %8.4f',...
-                  tsim, error));
+  fprintf('Iteration time (sec) = %8.3f\nEffector position error = %8.4f\n',...
+                  tsim, error);
   if Plot3D == 0
     [X,Y] = plot_xy(np,p);
-    plot([X0(na),et(1)],[Y0(na),et(2)],' -k',...
-          X0,Y0,'-og', X,Y,'-ob',lw,2, et(1),et(2),' *r');
+    plot([X0(na),et(1)],[Y0(na),et(2)],' -k', ...
+          X0,Y0,'-og', X,Y,'-ob', et(1),et(2),' *r', lw,2);
     X0 = X; Y0 = Y;
   else  
-    [X,Y,Z] = plot_xyz(np,p); 
-    plot3(X0,Y0,Z0,'-og', X,Y,Z,'-ob',lw,2, et(1),et(2),et(3),' *r');
+    [X,Y,Z] = plot_xyz(np,p);
+    View3D = view();
+    plot3(X0,Y0,Z0,'-og', X,Y,Z,'-ob', et(1),et(2),et(3),' *r', lw,2);
+    view(View3D)
     X0 = X; Y0 = Y; Z0 = Z;
   end
   text(text_x,text_y,text_tsim(tsim),'fontweight','bold');
@@ -408,11 +414,12 @@ while button == 1
     et(2) = min(max(Ym,-6),6);
     et(3) = 0;
   else
-    theta = 2*pi*rand;
-    r     = 2 + 3*rand;
+    rnum  = rand;
+    theta = 2*pi*rnum;
+    r     = 1.5 + 3*rnum;
     et(1) = r*cos(theta);
     et(2) = r*sin(theta);
-    et(3) = 1 + 4*rand;
+    et(3) = 1 + 4*rnum;
   end
   pt = et;
   % Reset iteration counter and simulation time
@@ -424,10 +431,10 @@ end % end of button press loop
 %% Animation playback
 
 if Record == 1
-  display(sprintf('IK_Solver - Playback of recorded movie frames'));
-  display(sprintf('On the figure, use the mouse buttons:'));
-  display(sprintf('  + left to replay the movie'));
-  display(sprintf('  + right to exit the program'));
+  fprintf('IK_Solver - Playback of recorded movie frames\n');
+  fprintf('On the figure, use the mouse buttons:\n');
+  fprintf('  + left to replay the movie\n');
+  fprintf('  + right to exit the program\n');
   figM = figure('Name','IK_Solver - Recorded Frames','NumberTitle','Off');
   grid off;
   button = 1;
@@ -447,13 +454,17 @@ if Record == 1
   end
   filename = sprintf('IK_Solver_%d.avi',IKmethod);
   filepath = sprintf('./images/%s',filename);
-  display(sprintf('Recorded movie frames saved as file %s',filepath));
+  fprintf('Recorded movie frames saved as file %s\n',filepath);
   if isOctave
     info = imfinfo(F(1,1:end));
     image2avi(FMT, FPS, info.Width, info.Height, filepath(1:end));
   else
-    movie2avi(F,filepath,'fps',FPS,'compression','Cinepak','videoname',title);
+    v = VideoWriter(filepath, 'Motion JPEG AVI');
+    v.FrameRate = FPS;
+    open(v);
+    writeVideo(v,F);
+    close(v);
   end
 end
 
-display(sprintf('Program exit.'));
+fprintf('Program exit.\n');
