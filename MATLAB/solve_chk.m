@@ -22,7 +22,7 @@ else
   detxy = norm(etp(1:2));  % distance from base to target in xy plane
   detz = abs(etp(3));      % distance from base to target in z direction
   decxy = norm(ecp(1:2));  % distance from base to effector in xy plane
-  dotxy = (ecp(1:2)*etp(1:2)')/detxy;  % portion of ecp along etp in xy plane
+  dotxy = (ecp(1:2)*etp(1:2).')/detxy;  % portion of ecp along etp in xy plane
 
   if ((detxy - dxy) > derr) || ((detz - dz) > derr)
     % target currently beyond reach of effector; but is it

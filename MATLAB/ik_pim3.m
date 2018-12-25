@@ -20,9 +20,9 @@ for i = 1:m
   end
 end
 
-Jinv  = V*(Sinv*U');
+Jinv  = V*(Sinv*U.');
 Jprj  = eye(n) - Jinv*J;
-dq    = (Jinv*de' + Jprj*phi')';
+dq    = (Jinv*de.' + Jprj*phi.').';
 dqmax = max(abs(dq));
 for i = 1:length(dq)
   if dqmax > dqlim(i)
