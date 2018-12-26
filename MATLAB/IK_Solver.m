@@ -293,7 +293,7 @@ if Record == 1
   end
   k = 1;
   if isOctave
-    F(k,:) = putimage(fig1, k, FMT);
+    F(k,:) = putimage(fig1, k, FMT, Plot3D);
   else
     F(k) = getframe(fig1);
   end
@@ -387,7 +387,7 @@ while button == 1
       if Record == 1
         k = k + 1;
         if isOctave
-          F(k,:) = putimage(fig1, k, FMT);
+          F(k,:) = putimage(fig1, k, FMT, Plot3D);
         else
           F(k) = getframe(fig1);
         end
@@ -417,7 +417,7 @@ while button == 1
   if Record == 1
     k = k + 1;
     if isOctave
-      F(k,:) = putimage(fig1, k, FMT);
+      F(k,:) = putimage(fig1, k, FMT, Plot3D);
     else
       F(k) = getframe(fig1);
     end
