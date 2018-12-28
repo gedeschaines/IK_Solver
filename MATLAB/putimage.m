@@ -5,6 +5,6 @@ function [ fpath ] = putimage(h, i, fmt, iW, iH)
 
   fpath = sprintf ("./images/%ss/img_%04d.%s", fmt, i, fmt);
   psiz = sprintf("-S%d,%d", iW, iH);
-  print(h, fpath, psiz)
+  print(h, fpath, psiz);
   
 endfunction
