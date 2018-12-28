@@ -498,7 +498,8 @@ if Record == 1
       for k = 1:length(F)
         img = getimage(F(k,1:end));
         image([0 fig1pos(3)], [0 fig1pos(4)], img, 'clipping', "on");
-        set(figM, 'position', [720 100 fig1opos(3)*sfac fig1opos(4)]);
+        figMpos = get(figM, 'position');
+        set(figM, 'position', [figMpos(1) figMpos(2) fig1opos(3)*sfac fig1opos(4)]);
         axis("off");
         pause(1.0/FPS);
       end
