@@ -89,7 +89,7 @@ p180rad =  180*rpd;
 n180rad = -180*rpd;
 
 Plot3D = 0;  % plot in 3D flag
-Record = 0;  % record movie flag
+Record = 1;  % record movie flag
 
 UseCCD   = 1;  % use cyclic coordinate descent
 UseJTM   = 2;  % use jacobian transpose method
@@ -248,8 +248,9 @@ perr  = atan(derr/efd);       % allowable effector to target pointing error
 
 text_tsim = @(t){ sprintf('time = %.3f', t) };
 
-lw = 'linewidth';
-fig1 = figure('Name',title,'NumberTitle','Off');
+fig1 = figure('Name', title, 'NumberTitle', 'Off', ...
+              'position', [120 100 580 480]);
+lw = 'linewidth';  % abbreviation convenience
 if Plot3D == 0
   [X0,Y0] = plot_xy(np,p);
   plot([X0(na),et(1)],[Y0(na),et(2)], ...
@@ -280,6 +281,13 @@ set(gca,'NextPlot','ReplaceChildren');
 text(text_x,text_y,text_tsim(tsim),'fontweight','bold');
 drawnow;
 
+% specific sized plot figure for consistancy between MATLAB/Octave
+if isOctave
+  fig1pos = get(fig1, 'position');
+else
+  fig1pos = get(fig1, 'innerposition');
+end
+
 FMT = "jpg";  % Set to "png" or "jpg"
 if Record == 1
   if ~exist("./images", 'dir')
@@ -293,9 +301,9 @@ if Record == 1
   end
   k = 1;
   if isOctave
-    F(k,:) = putimage(fig1, k, FMT, Plot3D);
+    F(k,:) = putimage(fig1, k, FMT, fig1pos(3), fig1pos(4));
   else
-    F(k) = getframe(fig1);
+    F(k) = getframe(fig1, [0 0 fig1pos(3), fig1pos(4)]);
   end
 end
 
@@ -372,14 +380,25 @@ while button == 1
     if ik == 0
       if Plot3D == 0
         [X,Y] = plot_xy(np,p);
-        plot([X0(na),pt(1)],[Y0(na),pt(2)],' -k', ...
-              X0,Y0,'-og', X,Y,'-ob', ...
-              et(1),et(2),' *r',  pt(1),pt(2),' *m', lw,2);
+        if isOctave
+          plot([X0(na),pt(1)],[Y0(na),pt(2)],' -k', ...
+                X0,Y0,'-og', X,Y,'-ob',lw,2, ...
+                et(1),et(2),' *r',  pt(1),pt(2),' *m');
+        else
+          plot([X0(na),pt(1)],[Y0(na),pt(2)],' -k', ...
+                X0,Y0,'-og', X,Y,'-ob', ...
+                et(1),et(2),' *r',  pt(1),pt(2),' *m', lw,2);
+        end
       else
         [X,Y,Z] = plot_xyz(np,p);
         [ViewAz,ViewEl] = view();
-        plot3(X0,Y0,Z0,'-og', X,Y,Z,'-ob', ...
-              et(1),et(2),et(3),' *r', pt(1),pt(2),pt(3),' *m', lw,2);
+        if isOctave
+          plot3(X0,Y0,Z0,'-og', X,Y,Z,'-ob',lw,2, ...
+                et(1),et(2),et(3),' *r', pt(1),pt(2),pt(3),' *m');
+        else
+          plot3(X0,Y0,Z0,'-og', X,Y,Z,'-ob', ...
+                et(1),et(2),et(3),' *r', pt(1),pt(2),pt(3),' *m', lw,2);   
+        end
         view(ViewAz,ViewEl);
       end
       text(text_x,text_y,text_tsim(tsim),'fontweight','bold');
@@ -387,9 +406,9 @@ while button == 1
       if Record == 1
         k = k + 1;
         if isOctave
-          F(k,:) = putimage(fig1, k, FMT, Plot3D);
+          F(k,:) = putimage(fig1, k, FMT, fig1pos(3), fig1pos(4));
         else
-          F(k) = getframe(fig1);
+          F(k) = getframe(fig1, [0 0 fig1pos(3), fig1pos(4)]);
         end
       end
       ik = kfps; % reset iteration count till next plot update
@@ -402,13 +421,22 @@ while button == 1
                   tsim, error);
   if Plot3D == 0
     [X,Y] = plot_xy(np,p);
-    plot([X0(na),et(1)],[Y0(na),et(2)],' -k', ...
-          X0,Y0,'-og', X,Y,'-ob', et(1),et(2),' *r', lw,2);
+    if isOctave
+      plot([X0(na),et(1)],[Y0(na),et(2)],' -k', ...
+            X0,Y0,'-og', X,Y,'-ob',lw,2, et(1),et(2),' *r');
+    else
+      plot([X0(na),et(1)],[Y0(na),et(2)],' -k', ...
+            X0,Y0,'-og', X,Y,'-ob', et(1),et(2),' *r', lw,2);
+    end
     X0 = X; Y0 = Y;
   else  
     [X,Y,Z] = plot_xyz(np,p);
     [ViewAz,ViewEl] = view();
-    plot3(X0,Y0,Z0,'-og', X,Y,Z,'-ob', et(1),et(2),et(3),' *r', lw,2);
+    if isOctave
+      plot3(X0,Y0,Z0,'-og', X,Y,Z,'-ob',lw,2, et(1),et(2),et(3),' *r');
+    else
+      plot3(X0,Y0,Z0,'-og', X,Y,Z,'-ob', et(1),et(2),et(3),' *r', lw,2);
+    end
     view(ViewAz,ViewEl)
     X0 = X; Y0 = Y; Z0 = Z;
   end
@@ -417,9 +445,9 @@ while button == 1
   if Record == 1
     k = k + 1;
     if isOctave
-      F(k,:) = putimage(fig1, k, FMT, Plot3D);
+      F(k,:) = putimage(fig1, k, FMT, fig1pos(3), fig1pos(4));
     else
-      F(k) = getframe(fig1);
+      F(k) = getframe(fig1, [0 0 fig1pos(3), fig1pos(4)]);
     end
   end
   % Wait for button press
@@ -453,19 +481,29 @@ if Record == 1
   fprintf('On the figure, use the mouse buttons:\n');
   fprintf('  + left to replay the movie\n');
   fprintf('  + right to exit the program\n');
-  figM = figure('Name','IK_Solver - Recorded Frames','NumberTitle','Off');
+  figM = figure('Name', 'IK_Solver - Recorded Frames', ...
+                'NumberTitle', 'Off', ...
+                'toolbar', 'none');
+  fig1opos = get(fig1, 'outerposition');
+  sfac = fig1opos(4)/fig1pos(4);             
+  if isOctave
+    set(figM, 'position', [720 100 fig1opos(3)*sfac fig1opos(4)])
+  else
+    set(figM, 'outerposition', [720 100 fig1opos(3)*sfac fig1opos(4)]);
+  end
   grid off;
   button = 1;
   while button == 1
     if isOctave
       for k = 1:length(F)
         img = getimage(F(k,1:end));
-        image(img, 'clipping', "on");
+        image([0 fig1pos(3)], [0 fig1pos(4)], img, 'clipping', "on");
+        set(figM, 'position', [720 100 fig1opos(3)*sfac fig1opos(4)]);
         axis("off");
         pause(1.0/FPS);
       end
     else
-      axis off
+      axis off;
       movie(figM,F);
     end
     [Xm,Ym,button] = ginput(1);
