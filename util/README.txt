@@ -4,7 +4,7 @@ pngtogif.sh  - Bash shell script to convert a squence of PNG file to GIF files
                and merge the GIF files into an animated GIF using ImageMajick
                convert program.
 
-pngs2gifs.py - Python program which converts series of PNG "####.png" files to
+pngs2agif.py - Python program which converts series of PNG "####.png" files to
                a single animated GIF "frames_0000_####.gif" file using the Python
                Imaging Library (PIL) and the gifmaker.py script obtained from the
                source distribution of PIL. 
