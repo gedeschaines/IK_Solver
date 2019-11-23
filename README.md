@@ -59,14 +59,16 @@ as a single executable program, or as client/server programs.
 
    where the command line arguments $1, $2 and $3 can be as follows.
 
-     $1 - The IK solver method option \[1,2,3,4,5] where:
+     $1 - The IK solver method option \[1,2,3,4,5,6,7] where:
 
             1 = Cyclic Coordinate Descent (CCD)
             2 = Jacobian Transpose Method (JTM)
             3 = Pseudo-inverse Jacobian method 2 (PIM2)
             4 = Pseudo-inverse Jacobian method 3 (PIM3)
             5 = Damped Least Squares (DLS)
-
+            6 = PIM3 solver with null space control
+            7 = DLS solver with null space control
+            
      $2 - The reference frame and plotting mode (0=2D, 1=3D).
 
      $3 - The animation recording switch (0=Off, 1=On). Note that
@@ -95,9 +97,12 @@ pointing in the +X direction for the PIM3 and DLS methods. Similarly for the 3D 
 the null space is used to coerce the end-effector link segment to be pointing in the
 +X direction.
 
-The utility of the IK_Solver client/server configuration will become apparent
-when it's revealed how IK_Solver can be used to drive an IK skeleton rigged
-robot in [Blender](https://www.blender.org)!
+The utility of the IK_Solver client/server configuration will become apparent when
+it's demonstrated how IK_Solver can be used to drive an armature skeleton rigged
+3D model of a robotic manipulator arm in [Blender](https://www.blender.org)! See 
+[README.txt](./Blender/FourLink3D/README.txt) file under the ./Blender/FourLink3D
+subdirectory for instructions on using Blender to animate the representative 3D 4-Link
+robotic manipulator arm illustrated in stick figure images above.
 
 #### Further Attention ####
 
