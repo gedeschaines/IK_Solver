@@ -140,11 +140,11 @@ def unpack_points_xyz(buffer,ioff):
   return (ioff, X, Y, Z)
   
 def sendTgtVel(n):
-  global tcpCliSock, BUFSIZ
+  global Plot3D, tcpCliSock, BUFSIZ
   # Set target's velocit based on frame number.
-  if n == 0 :
+  if Plot3D == 0 :
     tVel = np.array([-0.1, 0.0, 0.0])
-  elif n == 51:
+  else :
     tVel = np.array([ 0.0,-0.2, 0.0])
   # Flush buffer
   buffer = array('B',(0 for i in range(0,16)))  
@@ -423,6 +423,12 @@ if __name__ == '__main__':
     elif sval == '5' :
       IKmethod = UseDLS
       title = 'IK_Solver - Using Damped Least Squares [ref 3]'
+    elif sval == '6' :
+      IKmethod = UsePIM3dH
+      title = 'IK_Solver - Using Pseudo-Inverse Method with null space control [ref 3]'
+    elif sval == '7' :
+      IKmethod = UseDLSdH
+      title = 'IK_Solver - Using Damped Least Squares with null space control [ref 3]'
     else :
       sval     = '0'
       IKmethod = 0
