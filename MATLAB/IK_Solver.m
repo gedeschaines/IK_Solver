@@ -89,7 +89,7 @@ p180rad =  180*rpd;
 n180rad = -180*rpd;
 
 Plot3D = 0;  % plot in 3D flag
-Record = 1;  % record movie flag
+Record = 0;  % record movie flag
 
 UseCCD   = 1;  % use cyclic coordinate descent
 UseJTM   = 2;  % use jacobian transpose method
