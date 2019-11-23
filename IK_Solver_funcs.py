@@ -20,6 +20,8 @@
 #
 #   time_to_goal     - estimates time for end-effector to reach the 
 #                      target goal
+#   closing_gain     - closing gain for end effector motion toward
+#                      target
 #   avelT_wrt_jointm - angular velocity of the target with respect
 #                      to joint m
 #   avelE_wrt_jointm - angular velocity of end-effector with respect
@@ -317,6 +319,29 @@ def time_to_goal(pt,vt,w,p,dq):
   else :
     tgo = 0.0
   return tgo
+
+def closing_gain(ec,pt,vt):
+  """
+  function [gain] = closing_gain(ec,pt,vt) : returns end effector closing gain
+    ec = end effector current position in world space
+    pt = position of target in world space
+    vt = velocity of target in world space
+  """
+  de  = ec - pt
+  nde = la.norm(de)
+  nvt = la.norm(vt)
+  if (nde == 0.0) or (nvt == 0.0) :
+    gain = 1.0
+  else :
+    # compute cosine of approach angle relative to target velocity vector
+    aacos = np.dot(de/nde, vt/nvt)
+    if aacos <= 0.0 :
+      gain = 1.6
+    elif aacos <= 0.7071 :
+      gain = 1.2
+    else:
+      gain = 0.8
+  return gain
 
 def avelT_wrt_jointm(pt,vt,w,p,dq,m):
   """
