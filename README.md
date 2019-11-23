@@ -92,9 +92,9 @@ rotation direction vectors, and not with Denavit-Hartenberg (DH) parameters. The
 target's initial position and fixed velocity are hard-coded within animate2D and
 animate3D functions in IK_Solver.py, and as IK_solver class attributes et0
 and vt0 respectively in the IK_Solver_class.py file. For a 2D case, the pseudo-inverse
-null space is used to coerce the orienation of the end-effector link segment to be
+null space may be used to coerce the orienation of the end-effector link segment to be
 pointing in the +X direction for the PIM3 and DLS methods. Similarly for the 3D case,
-the null space is used to coerce the end-effector link segment to be pointing in the
+the null space may be used to coerce the end-effector link segment to be pointing in the
 +X direction.
 
 #### IK Solver and Blender ####
@@ -104,11 +104,18 @@ it's demonstrated how IK_Solver can be used to drive an armature skeleton rigged
 3D model of a robotic manipulator arm in [Blender](https://www.blender.org)! See 
 [README.txt](./Blender/FourLink3D/README.txt) file under the ./Blender/FourLink3D
 subdirectory for instructions on using Blender 2.74 to animate the representative
-3D 4-Link robotic manipulator arm illustrated in stick figure images above.
+3D 4-Link robotic manipulator arm illustrated in Matplotlib stick figure images 
+above and as shown in Blender rendered images below. Clicking on the static images
+will link to an animated GIF image depicting robotic arm motion from initial pose 
+(frame 0) to target intercept (frame 97).
 
-Blender 3D 4-Link Frame 0 | Blender 3D 4-Link Frame 97
-------------------------- | --------------------------
+Blender Rendered 3D 4-Link Frame 0 | Blender Rendered 3D 4-Link Frame 97
+---------------------------------- | -----------------------------------
 <a href="./Blender/FourLink3D/renders/imgCGI_anim.gif"><img src="./docs/images/Blender_IK_Solver_7_3D_00.png" alt="./docs/images/Blender_IK_Solver_7_3D_00.png" width="450" height="300"></a>|<a href="./Blender/FourLink3D/renders/imgCGI_anim.gif"><img src="./docs/images/Blender_IK_Solver_7_3D_97.png" alt="./docs/images/Blender_IK_Solver_7_3D_97.png" width="450" height="300"></a>
+
+Blender OpenGL Render 3D 4-Link Frame 0 | Blender OpenGL Render 3D 4-Link Frame 97
+--------------------------------------- | ----------------------------------------
+<a href="./Blender/FourLink3D/renders/imgOGL_anim.gif"><img src="./docs/images/Blender_IK_Solver_7_GL_00.png" alt="./docs/images/Blender_IK_Solver_7_GL_00.png" width="450" height="300"></a>|<a href="./Blender/FourLink3D/renders/imgOGL_anim.gif"><img src="./docs/images/Blender_IK_Solver_7_GL_97.png" alt="./docs/images/Blender_IK_Solver_7_GL_97.png" width="450" height="300"></a>
 
 #### Further Attention ####
 
