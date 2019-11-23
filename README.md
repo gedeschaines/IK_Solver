@@ -97,12 +97,18 @@ pointing in the +X direction for the PIM3 and DLS methods. Similarly for the 3D 
 the null space is used to coerce the end-effector link segment to be pointing in the
 +X direction.
 
+#### IK Solver and Blender ####
+
 The utility of the IK_Solver client/server configuration will become apparent when
 it's demonstrated how IK_Solver can be used to drive an armature skeleton rigged
 3D model of a robotic manipulator arm in [Blender](https://www.blender.org)! See 
 [README.txt](./Blender/FourLink3D/README.txt) file under the ./Blender/FourLink3D
-subdirectory for instructions on using Blender to animate the representative 3D 4-Link
-robotic manipulator arm illustrated in stick figure images above.
+subdirectory for instructions on using Blender 2.74 to animate the representative
+3D 4-Link robotic manipulator arm illustrated in stick figure images above.
+
+Blender 3D 4-Link Frame 0 | Blender 3D 4-Link Frame 97
+------------------------- | --------------------------
+<a href="./Blender/FourLink3D/renders/imgCGI_anim.gif"><img src="./docs/images/Blender_IK_Solver_7_3D_00.png" alt="./docs/images/Blender_IK_Solver_7_3D_00.png" width="450" height="300"></a>|<a href="./Blender/FourLink3D/renders/imgCGI_anim.gif"><img src="./docs/images/Blender_IK_Solver_7_3D_97.png" alt="./docs/images/Blender_IK_Solver_7_3D_97.png" width="450" height="300"></a>
 
 #### Further Attention ####
 
