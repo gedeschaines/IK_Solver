@@ -30,8 +30,9 @@
 #
 # and these methods intended only for private use.
 #
-#   done              - applies IK solver completion criteria
-#   set_points_x0y0z0 - sets starting link coordinates for plotting
+#   done               - applies IK solver completion criteria
+#   null_space_control - computes null space control vector
+#   set_points_x0y0z0  - sets starting link coordinates for plotting
 #
 # Disclaimer:
 #
@@ -56,17 +57,19 @@ except ImportError:
   print("* Error: IK_Solver_funcs.py required.")
   sys.exit()
   
-UseCCD  = 1  # use cyclic coordinate descent (CCD) from ref [1]
-UseJTM  = 2  # use jacobian transpose method from ref [1,2]
-UsePIM2 = 3  # use pseudo-inverse method from ref [2]
-UsePIM3 = 4  # use pseudo-inverse method from ref [3]
-UseDLS  = 5  # use damped least squares from ref [3]
+UseCCD    = 1  # use cyclic coordinate descent (CCD) from ref [1]
+UseJTM    = 2  # use jacobian transpose method from ref [1,2]
+UsePIM2   = 3  # use pseudo-inverse method from ref [2]
+UsePIM3   = 4  # use pseudo-inverse method from ref [3]
+UseDLS    = 5  # use damped least squares from ref [3]
+UsePIM3dH = 6  # use pseudo-inverse method from ref [3] with null space control
+UseDLSdH  = 7  # use damped least squares from ref [3] with null space control
 
 class IK_Solver:
   
   def __init__(self,p3d,ik,a,u,q0,qmin,qmax,dqlim):
     """
-    IK_Solver - class object constructor
+    IK_Solver class - object constructor
     """
     self.Plot3D   = p3d    # plot mode (0=2D, 1=3D)
     self.IKmethod = ik     # selected IK solver method
@@ -110,11 +113,11 @@ class IK_Solver:
       self.et0 = np.array([ 3.0, 4.0, 0.0])  # position vector
       self.vt0 = np.array([-0.1, 0.0, 0.0])  # velocity vector
     else :
-      self.et0 = np.array([ 3.0, 3.0, 2.0])  # position vector
+      self.et0 = np.array([ 3.0, 2.5, 2.0])  # position vector
       self.vt0 = np.array([ 0.0,-0.2, 0.0])  # velocity vector
-    self.et = self.et0
-    self.vt = self.vt0
-    self.pt = self.et0
+    self.et = self.et0  # end effector target position in world space
+    self.vt = self.vt0  # velocity of target in world space
+    self.pt = self.et0  # predicted target position in world space
 
     self.h      = 0.04                      # IK iteration step size
     self.ilim   = int(30.0/self.h)          # IK iteration limit for 30 seconds
@@ -137,6 +140,9 @@ class IK_Solver:
     random.seed(987654321)
     
   def zero(self):
+    """
+    IK_Solver class - zero object state function
+    """
     self.q          = self.q0
     self.dq         = np.zeros(self.nq)
     (self.p,self.w) = transform(self.na,self.q,self.u,self.a)
@@ -152,10 +158,78 @@ class IK_Solver:
     self.lastni     = 0
     self.button     = 0
     self.set_points_x0y0z0()
-    
+
+  def null_space_control(self):
+    """
+    IK solver class - null space control vector computation function
+    """
+    if self.Plot3D == 0 :
+      '''
+      print("dq  = %8.5f %8.5f %8.5f %8.5f" % \
+              (self.dq[0],self.dq[1],self.dq[2],self.dq[4]) )
+      '''
+      avT1 = avelT_wrt_jointm(self.et,self.vt,self.w,self.p,self.dq,1)
+      avT2 = avelT_wrt_jointm(self.et,self.vt,self.w,self.p,self.dq,2)
+      avT3 = avelT_wrt_jointm(self.et,self.vt,self.w,self.p,self.dq,3)
+      avT5 = avelT_wrt_jointm(self.et,self.vt,self.w,self.p,self.dq,5)
+      avT  = np.array([avT1[2], avT2[2], avT3[2], 0.0, avT5[2]])
+      '''
+      print("avT = %8.5f %8.5f %8.5f %8.5f" % \
+              (avT[0],avT[1],avT[2],avT[4]) )
+      '''
+      avE1 = avelE_wrt_jointm(self.w,self.p,self.dq,1)
+      avE2 = avelE_wrt_jointm(self.w,self.p,self.dq,2)
+      avE3 = avelE_wrt_jointm(self.w,self.p,self.dq,3)
+      avE5 = avelE_wrt_jointm(self.w,self.p,self.dq,5)
+      avE  = np.array([avE1[2], avE2[2], avE3[2], 0.0, avE5[2]])
+      '''
+      print("avE = %8.5f %8.5f %8.5f %8.5f" % \
+              (avE[0],avE[1],avE[2],avE[4]) )
+      '''
+      self.dH[0] = avE[0]
+      self.dH[1] = avE[1]
+      self.dH[2] = avE[2]
+      #self.dH[4] = avE[4]
+              
+      phiZ = self.get_endeff_rot()
+      '''
+      print("phiZ = %8.5f" % (phiZ*dpr))
+      '''
+      self.dH[self.nq-1] = phiZ
+    else :
+      '''
+      print("dq  = %8.5f %8.5f %8.5f" % \
+              (self.dq[0],self.dq[1],self.dq[2]) )
+      '''
+      avT1 = avelT_wrt_jointm(self.et,self.vt,self.w,self.p,self.dq,1)
+      avT2 = avelT_wrt_jointm(self.et,self.vt,self.w,self.p,self.dq,2)
+      avT3 = avelT_wrt_jointm(self.et,self.vt,self.w,self.p,self.dq,3)
+      avT  = np.array([avT1[2], avT2[1], avT3[1], 0.0, 0.0])
+      '''
+      print("avT = %8.5f %8.5f %8.5f" % (avT[0],avT[1],avT[2]) )
+      '''
+      avE1 = avelE_wrt_jointm(self.w,self.p,self.dq,1)
+      avE2 = avelE_wrt_jointm(self.w,self.p,self.dq,2)
+      avE3 = avelE_wrt_jointm(self.w,self.p,self.dq,3)
+      avE  = np.array([avE1[2], avE2[1], avE3[1], 0.0, 0.0])
+      '''
+      print("avE = %8.5f %8.5f %8.5f" % (avE[0],avE[1],avE[2]) )
+      '''
+      self.dH[0] = avE[0]
+      self.dH[1] = avE[1]
+      self.dH[2] = avE[2]
+       
+      (psi,theta,phi) = self.get_endeff_ypr()
+      '''
+      print("psi,theta,phi = %8.5f, %8.5f, %8.5f" % \
+              (psi*dpr,theta*dpr,phi*dpr) )
+      '''
+      self.dH[self.nq-2] = -theta
+      self.dH[self.nq-1] = -psi
+
   def done(self,ni):
     """
-    IK Solver - iteration done check function
+    IK Solver class - iteration done check function
     """
     if ni == self.ilim : return True
        
@@ -172,16 +246,18 @@ class IK_Solver:
       if (abs(decxy - self.dxy) > self.derr) or \
          (np.arccos(dotxy/decxy) > self.perr) :
         return False
+      print("Encountered done condition 1.")
     else :
       # target currently not beyond reach of effector; but is it
       # outside allowable distance?
       if (la.norm(self.et - self.ec) > self.derr) :
         return False
+      print("Encountered done condition 2.")
     return True
     
   def step(self,tdel):
     """
-    IK solver - iteration time step function
+    IK solver class - iteration time step function
     """
     if ( self.button == -1 ) : return
        
@@ -206,15 +282,17 @@ class IK_Solver:
       else :
         # Calculate IK solution for dq
         if self.IKmethod == UseCCD :
+          # predicted target position at tgo relative to link
+          gain = closing_gain(self.ec, self.et, self.vt)
+          ept =  self.et + gain*self.tgo*self.vt
           self.dq = np.zeros(self.nq)
           for i in range(self.nq-1,-1,-1) :
-            pt    = self.et + self.tgo*self.vt - self.p[i]
-            # predicted target position at tgo relative to link
-            npt   = la.norm(pt)
-            pc    = self.ec - self.p[i]
-            npc   = la.norm(pc)
-            ut    = np.cross(np.cross(self.w[i],pc/npc),\
-                             np.cross(self.w[i],pt/npt))
+            pt  =  ept - self.p[i]
+            npt = la.norm(pt)
+            pc  = self.ec - self.p[i]
+            npc = la.norm(pc)
+            ut  = np.cross(np.cross(self.w[i],pc/npc),\
+                           np.cross(self.w[i],pt/npt))
             if la.norm(ut) > 0.0 :
               ut         = ut/la.norm(ut)
               dq         = np.arccos(np.dot(pt,vT(pc/npc))/npt)
@@ -224,7 +302,8 @@ class IK_Solver:
               self.dq[i] = 0.0
         else :
           # error from effector to predicted target position at tgo
-          de = self.et + self.tgo*self.vt - self.ec
+          gain = closing_gain(self.ec, self.et, self.vt)
+          de = self.et + gain*self.tgo*self.vt - self.ec
           #de = self.et - self.ec
           #Jt = jacobian(self.nq,self.w,self.p,self.et+self.tgo*self.vt)
           Jc = jacobian(self.nq,self.w,self.p,self.ec)
@@ -234,140 +313,16 @@ class IK_Solver:
           elif self.IKmethod == UsePIM2 :
             self.dq = ik_pim2(J,de,self.sdel,self.dqlim)  
           elif self.IKmethod == UsePIM3 :
-            # Use dH to coerce end-effector orientation
-            if self.Plot3D == 0 :
-              '''
-              print("dq  = %8.5f %8.5f %8.5f %8.5f" % \
-                    (self.dq[0],self.dq[1],self.dq[2],self.dq[4]) )
-              '''
-              avT1 = avelT_wrt_jointm(self.et,self.vt,self.w,self.p,self.dq,1)
-              avT2 = avelT_wrt_jointm(self.et,self.vt,self.w,self.p,self.dq,2)
-              avT3 = avelT_wrt_jointm(self.et,self.vt,self.w,self.p,self.dq,3)
-              avT5 = avelT_wrt_jointm(self.et,self.vt,self.w,self.p,self.dq,5)
-              avT  = np.array([avT1[2], avT2[2], avT3[2], 0.0, avT5[2]])
-              '''
-              print("avT = %8.5f %8.5f %8.5f %8.5f" % \
-                    (avT[0],avT[1],avT[2],avT[4]) )
-              '''
-              avE1 = avelE_wrt_jointm(self.w,self.p,self.dq,1)
-              avE2 = avelE_wrt_jointm(self.w,self.p,self.dq,2)
-              avE3 = avelE_wrt_jointm(self.w,self.p,self.dq,3)
-              avE5 = avelE_wrt_jointm(self.w,self.p,self.dq,5)
-              avE  = np.array([avE1[2], avE2[2], avE3[2], 0.0, avE5[2]])
-              '''
-              print("avE = %8.5f %8.5f %8.5f %8.5f" % \
-                    (avE[0],avE[1],avE[2],avE[4]) )
-              '''
-              self.dH[0] = avE[0]
-              self.dH[1] = avE[1]
-              self.dH[2] = avE[2]
-              #self.dH[4] = avE[4]
-
-              phiZ = self.get_endeff_rot()
-              '''
-              print("phiZ = %8.5f" % (phiZ*dpr))
-              '''
-              self.dH[self.nq-1] = phiZ
-            else :
-              '''
-              print("dq  = %8.5f %8.5f %8.5f" % \
-                    (self.dq[0],self.dq[1],self.dq[2]) )
-              '''
-              avT1 = avelT_wrt_jointm(self.et,self.vt,self.w,self.p,self.dq,1)
-              avT2 = avelT_wrt_jointm(self.et,self.vt,self.w,self.p,self.dq,2)
-              avT3 = avelT_wrt_jointm(self.et,self.vt,self.w,self.p,self.dq,3)
-              avT  = np.array([avT1[2], avT2[1], avT3[1], 0.0, 0.0])
-              '''
-              print("avT = %8.5f %8.5f %8.5f" % \
-                    (avT[0],avT[1],avT[2]) )
-              '''
-              avE1 = avelE_wrt_jointm(self.w,self.p,self.dq,1)
-              avE2 = avelE_wrt_jointm(self.w,self.p,self.dq,2)
-              avE3 = avelE_wrt_jointm(self.w,self.p,self.dq,3)
-              avE  = np.array([avE1[2], avE2[1], avE3[1], 0.0, 0.0])
-              '''
-              print("avE = %8.5f %8.5f %8.5f" % \
-                    (avE[0],avE[1],avE[2]) )
-              '''
-              self.dH[0] = avE[0]
-              self.dH[1] = avE[1]
-              self.dH[2] = avE[2]
-              
-              (psi,theta,phi) = self.get_endeff_ypr()
-              '''
-              print("psi,theta,phi = %8.5f, %8.5f, %8.5f" % \
-                    (psi*dpr,theta*dpr,phi*dpr) )
-              '''
-              self.dH[self.nq-2] = -theta
-              self.dH[self.nq-1] = -psi
             self.dq = ik_pim3(J,de,self.sfac,self.dqlim,self.dH)
           elif self.IKmethod == UseDLS :
+            self.dq = ik_dls(J,de,self.slam,self.dqlim,self.dH)
+          elif self.IKmethod == UsePIM3dH :
             # Use dH to coerce end-effector orientation
-            if self.Plot3D == 0 :
-              '''
-              print("dq  = %8.5f %8.5f %8.5f %8.5f" % \
-                    (self.dq[0],self.dq[1],self.dq[2],self.dq[4]) )
-              '''
-              avT1 = avelT_wrt_jointm(self.et,self.vt,self.w,self.p,self.dq,1)
-              avT2 = avelT_wrt_jointm(self.et,self.vt,self.w,self.p,self.dq,2)
-              avT3 = avelT_wrt_jointm(self.et,self.vt,self.w,self.p,self.dq,3)
-              avT5 = avelT_wrt_jointm(self.et,self.vt,self.w,self.p,self.dq,5)
-              avT  = np.array([avT1[2], avT2[2], avT3[2], 0.0, avT5[2]])
-              ''''
-              print("avT = %8.5f %8.5f %8.5f %8.5f" % \
-                    (avT[0],avT[1],avT[2],avT[4]) )
-              '''
-              avE1 = avelE_wrt_jointm(self.w,self.p,self.dq,1)
-              avE2 = avelE_wrt_jointm(self.w,self.p,self.dq,2)
-              avE3 = avelE_wrt_jointm(self.w,self.p,self.dq,3)
-              avE5 = avelE_wrt_jointm(self.w,self.p,self.dq,5)
-              avE  = np.array([avE1[2], avE2[2], avE3[2], 0.0, avE5[2]])
-              '''
-              print("avE = %8.5f %8.5f %8.5f %8.5f" % \
-                    (avE[0],avE[1],avE[2],avE[4]) )
-              '''
-              self.dH[0] = avE[0]
-              self.dH[1] = avE[1]
-              self.dH[2] = avE[2]
-              #self.dH[4] = avE[4]
-              
-              phiZ = self.get_endeff_rot()
-              '''
-              print("phiZ = %8.5f" % (phiZ*dpr))
-              '''
-              self.dH[self.nq-1] = phiZ
-            else :
-              '''
-              print("dq  = %8.5f %8.5f %8.5f" % \
-                    (self.dq[0],self.dq[1],self.dq[2]) )
-              '''
-              avT1 = avelT_wrt_jointm(self.et,self.vt,self.w,self.p,self.dq,1)
-              avT2 = avelT_wrt_jointm(self.et,self.vt,self.w,self.p,self.dq,2)
-              avT3 = avelT_wrt_jointm(self.et,self.vt,self.w,self.p,self.dq,3)
-              avT  = np.array([avT1[2], avT2[1], avT3[1], 0.0, 0.0])
-              '''
-              print("avT = %8.5f %8.5f %8.5f" % \
-                    (avT[0],avT[1],avT[2]) )
-              '''
-              avE1 = avelE_wrt_jointm(self.w,self.p,self.dq,1)
-              avE2 = avelE_wrt_jointm(self.w,self.p,self.dq,2)
-              avE3 = avelE_wrt_jointm(self.w,self.p,self.dq,3)
-              avE  = np.array([avE1[2], avE2[1], avE3[1], 0.0, 0.0])
-              '''
-              print("avE = %8.5f %8.5f %8.5f" % \
-                    (avE[0],avE[1],avE[2]) )
-              '''
-              self.dH[0] = avE[0]
-              self.dH[1] = avE[1]
-              self.dH[2] = avE[2]
-              
-              (psi,theta,phi) = self.get_endeff_ypr()
-              '''
-              print("psi,theta,phi = %8.5f, %8.5f, %8.5f" % \
-                    (psi*dpr,theta*dpr,phi*dpr) )
-              '''
-              self.dH[self.nq-2] = -theta
-              self.dH[self.nq-1] = -psi
+            self.null_space_control()
+            self.dq = ik_pim3(J,de,self.sfac,self.dqlim,self.dH)
+          elif self.IKmethod == UseDLSdH :
+            # Use dH to coerce end-effector orientation
+            self.null_space_control()
             self.dq = ik_dls(J,de,self.slam,self.dqlim,self.dH)
         # Update link chain angles and positions
         self.q = self.q + self.h*self.dq
@@ -378,7 +333,8 @@ class IK_Solver:
         self.ec  = self.p[self.ia]
         self.et  = self.et + self.h*self.vt
         self.tgo = time_to_goal(self.et,self.vt,self.w,self.p,self.dq)
-        self.pt  = self.et + self.tgo * self.vt
+        gain = closing_gain(self.ec, self.et, self.vt)
+        self.pt = self.et + gain*self.tgo*self.vt
         # Increment iteration counters and time
         self.lastni = self.ni
         self.ni     = self.ni + 1
