@@ -87,6 +87,15 @@ def pack_points_xyz(buffer,ioff,n,X,Y,Z):
     ioff = ioff + calcsize('fff')
   return ioff
 
+def pack_joints_rot(buffer,ioff,n,Q):
+  
+  pack_into('I',buffer,ioff,n)
+  ioff = ioff + calcsize('I')
+  for i in range(0,n) :
+    pack_into('f',buffer,ioff,Q[i])
+    ioff = ioff + calcsize('f')
+  return ioff
+
 def unpack_mouse_bxy(buffer,ioff):
   
   (b,) = unpack_from('I',buffer,ioff)
@@ -175,6 +184,37 @@ def ik_update3D(i):
   ioff = pack_points_xyz(buffer,ioff,n,XPT,YPT,ZPT)
   return (ioff, buffer)
 
+def ik_updateBL(i):
+  """
+  IK solver update function for Blender animation
+  """
+  global BUFSIZ, ik_solver, tdel
+  
+  ik_solver.step(tdel)
+  if i == 0 :
+    ik_solver.zero()
+    
+  # Get data from IK solver
+  time       = ik_solver.tsolve
+  (XT,YT,ZT) = ik_solver.get_target_xyz()
+  (XE,YE,ZE) = ik_solver.get_endeff_xyz()
+  (Q)        = ik_solver.get_joints_rot()
+  
+  # Flush buffer
+  buffer = array('B',(0 for i in range(0,BUFSIZ)))
+  
+  # Pack data to send to client
+  ioff = 0
+  pack_into('f',buffer,ioff,time)
+  ioff = ioff + calcsize('f')
+  n = np.size(XT)
+  ioff = pack_points_xyz(buffer,ioff,n,XT,YT,ZT)
+  n = np.size(XE)
+  ioff = pack_points_xyz(buffer,ioff,n,XE,YE,ZE)
+  n = np.size(Q)
+  ioff = pack_joints_rot(buffer,ioff,n,Q)
+  
+  return (ioff, buffer)
 
 # IK_Solver server main.
 
@@ -232,9 +272,11 @@ if __name__ == '__main__':
         (s, p1) = data.split(' ',1)
         i = int(p1)
         if Plot3D == 0 :
-          (n, data) = ik_update2D(i);
-        else :
-          (n, data) = ik_update3D(i);
+          (n, data) = ik_update2D(i)
+        elif Plot3D == 1 :
+          (n, data) = ik_update3D(i)
+        elif Plot3D == 2 :
+          (n, data) = ik_updateBL(i)
         tcpCliSock.send(data)
       elif raw_data[0] == 'M'.encode('utf-8')[0] :
         (ioff,b,x,y) = unpack_mouse_bxy(raw_data,1)
