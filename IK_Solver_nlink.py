@@ -102,4 +102,3 @@ def get_nlink_chain(Plot3D) :
                          30*rpd]) # <- joint 5 /
     
   return (a, u, q0, qmin, qmax, dqlim)
-
