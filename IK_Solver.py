@@ -276,6 +276,12 @@ if __name__ == '__main__':
     elif sval == '5' :
       IKmethod = UseDLS
       title = 'IK_Solver - Using Damped Least Squares [ref 3]'
+    elif sval == '6' :
+      IKmethod = UsePIM3dH
+      title = 'IK_Solver - Using Pseudo-Inverse Method with null space control [ref 3]'
+    elif sval == '7' :
+      IKmethod = UseDLSdH
+      title = 'IK_Solver - Using Damped Least Squares with null space control [ref 3]'
     else :
       sval     = '0'
       IKmethod = 0
