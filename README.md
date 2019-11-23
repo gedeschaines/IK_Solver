@@ -105,17 +105,17 @@ it's demonstrated how IK_Solver can be used to drive an armature skeleton rigged
 [README.txt](./Blender/FourLink3D/README.txt) file under the ./Blender/FourLink3D
 subdirectory for instructions on using Blender 2.74 to animate the representative
 3D 4-Link robotic manipulator arm illustrated in Matplotlib stick figure images 
-above and as shown in Blender rendered images below. Clicking on the static images
-will link to an animated GIF image depicting robotic arm motion from initial pose 
-(frame 0) to target intercept (frame 97).
+above and as shown in Blender rendered images below. Clicking on the rendered images
+will link to a YouTube video or animated GIF image depicting robotic arm motion from
+initial pose (frame 0) to target intercept (frame 97).
 
 Blender Rendered 3D 4-Link Frame 0 | Blender Rendered 3D 4-Link Frame 97
 ---------------------------------- | -----------------------------------
-<a href="./Blender/FourLink3D/renders/imgCGI_anim.gif"><img src="./docs/images/Blender_IK_Solver_7_3D_00.png" alt="./docs/images/Blender_IK_Solver_7_3D_00.png" width="450" height="300"></a>|<a href="./Blender/FourLink3D/renders/imgCGI_anim.gif"><img src="./docs/images/Blender_IK_Solver_7_3D_97.png" alt="./docs/images/Blender_IK_Solver_7_3D_97.png" width="450" height="300"></a>
+<a href="https://youtu.be/l88V68Zht4U"><img src="./docs/images/Blender_IK_Solver_7_3D_00.png" alt="./docs/images/Blender_IK_Solver_7_3D_00.png" width="450" height="300"></a>|<a href="./Blender/FourLink3D/renders/imgCGI_anim.gif"><img src="./docs/images/Blender_IK_Solver_7_3D_97.png" alt="./docs/images/Blender_IK_Solver_7_3D_97.png" width="450" height="300"></a>
 
 Blender OpenGL Render 3D 4-Link Frame 0 | Blender OpenGL Render 3D 4-Link Frame 97
 --------------------------------------- | ----------------------------------------
-<a href="./Blender/FourLink3D/renders/imgOGL_anim.gif"><img src="./docs/images/Blender_IK_Solver_7_GL_00.png" alt="./docs/images/Blender_IK_Solver_7_GL_00.png" width="450" height="300"></a>|<a href="./Blender/FourLink3D/renders/imgOGL_anim.gif"><img src="./docs/images/Blender_IK_Solver_7_GL_97.png" alt="./docs/images/Blender_IK_Solver_7_GL_97.png" width="450" height="300"></a>
+<a href="https://youtu.be/o_1quLYGM88"><img src="./docs/images/Blender_IK_Solver_7_GL_00.png" alt="./docs/images/Blender_IK_Solver_7_GL_00.png" width="450" height="300"></a>|<a href="./Blender/FourLink3D/renders/imgOGL_anim.gif"><img src="./docs/images/Blender_IK_Solver_7_GL_97.png" alt="./docs/images/Blender_IK_Solver_7_GL_97.png" width="450" height="300"></a>
 
 #### Further Attention ####
 
