@@ -10,3 +10,14 @@ The robot model's initial pose is specified by the IK_Solver class methods and i
 motion is determined by applying Damped Least Squares algorithm with null space
 control in response to movement of the end-effector target modeled as a blue sphere
 linked to an Empty object.
+
+The fourlink3d.blend file and IK_SolverPanel.py script were originally developed on
+a MS Windows 7 Pro operating system with Blender 2.68 and Python 3.3, and have been
+successfully used with Ubuntu operating system, Blender and Python versions listed
+in the following table.
+
+    Ubuntu  Blender  Python
+    ------  -------  ------
+     14.04    2.74    3.4.2
+     16.04    2.74    3.4.2
+     18.04    2.81    3.7.4
