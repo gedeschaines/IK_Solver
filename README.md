@@ -97,7 +97,7 @@ pointing in the +X direction for the PIM3 and DLS methods. Similarly for the 3D 
 the null space may be used to coerce the end-effector link segment to be pointing in the
 +X direction.
 
-#### IK Solver and Blender ####
+#### IK_Solver and Blender ####
 
 The utility of the IK_Solver client/server configuration will become apparent when
 it's demonstrated how IK_Solver can be used to drive an armature skeleton rigged
