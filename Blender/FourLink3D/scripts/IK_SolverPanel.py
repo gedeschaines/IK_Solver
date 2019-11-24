@@ -274,7 +274,7 @@ class IK_SolverQuit(bpy.types.Operator):
 
 ### IK_Solver menu panel
 
-class IK_SolverPanel(bpy.types.Panel):
+class ARMATURE_PT_IK_SolverPanel(bpy.types.Panel):
     bl_label = "IK Solver Server"
     bl_space_type = 'PROPERTIES'
     bl_region_type = 'WINDOW'
@@ -303,10 +303,10 @@ def register():
     bpy.utils.register_class(IK_SolverUpdate)
     bpy.utils.register_class(IK_SolverStop)
     bpy.utils.register_class(IK_SolverQuit)
-    bpy.utils.register_class(IK_SolverPanel)
+    bpy.utils.register_class(ARMATURE_PT_IK_SolverPanel)
 
 def unregister():
-    bpy.utils.register_class(IK_SolverPanel)
+    bpy.utils.register_class(ARMATURE_PT_IK_SolverPanel)
     bpy.utils.unregister_class(IK_SolverQuit)
     bpy.utils.unregister_class(IK_SolverStop)
     bpy.utils.unregister_class(IK_SolverUpdate)
