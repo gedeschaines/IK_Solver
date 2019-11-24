@@ -320,12 +320,13 @@ def time_to_goal(pt,vt,w,p,dq):
     tgo = 0.0
   return tgo
 
-def closing_gain(ec,pt,vt):
+def closing_gain(ikm,ec,pt,vt):
   """
-  function [gain] = closing_gain(ec,pt,vt) : returns end effector closing gain
-    ec = end effector current position in world space
-    pt = position of target in world space
-    vt = velocity of target in world space
+  function [gain] = closing_gain(ikm,ec,pt,vt) : returns end effector closing gain
+    ikm = IKmethod
+    ec  = end effector current position in world space
+    pt  = position of target in world space
+    vt  = velocity of target in world space
   """
   de  = ec - pt
   nde = la.norm(de)
@@ -339,8 +340,9 @@ def closing_gain(ec,pt,vt):
       gain = 1.6
     elif aacos <= 0.7071 :
       gain = 1.2
-    else:
-      gain = 0.8
+    else :
+      if ikm < 6 : gain = 1.0  # without null space control
+      else       : gain = 0.8  # with null space control
   return gain
 
 def avelT_wrt_jointm(pt,vt,w,p,dq,m):

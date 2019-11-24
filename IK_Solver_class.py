@@ -283,7 +283,7 @@ class IK_Solver:
         # Calculate IK solution for dq
         if self.IKmethod == UseCCD :
           # predicted target position at tgo relative to link
-          gain = closing_gain(self.ec, self.et, self.vt)
+          gain = closing_gain(self.IKmethod, self.ec, self.et, self.vt)
           ept =  self.et + gain*self.tgo*self.vt
           self.dq = np.zeros(self.nq)
           for i in range(self.nq-1,-1,-1) :
@@ -302,7 +302,7 @@ class IK_Solver:
               self.dq[i] = 0.0
         else :
           # error from effector to predicted target position at tgo
-          gain = closing_gain(self.ec, self.et, self.vt)
+          gain = closing_gain(self.IKmethod, self.ec, self.et, self.vt)
           de = self.et + gain*self.tgo*self.vt - self.ec
           #de = self.et - self.ec
           #Jt = jacobian(self.nq,self.w,self.p,self.et+self.tgo*self.vt)
@@ -333,7 +333,7 @@ class IK_Solver:
         self.ec  = self.p[self.ia]
         self.et  = self.et + self.h*self.vt
         self.tgo = time_to_goal(self.et,self.vt,self.w,self.p,self.dq)
-        gain = closing_gain(self.ec, self.et, self.vt)
+        gain = closing_gain(self.IKmethod, self.ec, self.et, self.vt)
         self.pt = self.et + gain*self.tgo*self.vt
         # Increment iteration counters and time
         self.lastni = self.ni
