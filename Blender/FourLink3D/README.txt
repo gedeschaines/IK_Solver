@@ -11,7 +11,7 @@ defined in the scripts/IK_Solver_nlink.py file is determined by
 application of "Damped Least Squares" algorithm from the initial
 manipulator arm orientation to that obtained when the end effector
 is placed sufficiently close to the predicted intercept point of a
-moving target represented by an empty frame.
+moving target represented by a blue sphere linked to an empty frame.
 
 These instructions are for using Blender as the rendering interface
 to the IK_Solver program. The IK_Solver program can be executed with 
@@ -96,9 +96,18 @@ IK_Solver/README.txt file.
        viewed by the camera, switch the lower right window from scene
        "Armature1" skeleton pose (stick-man) mode to scene Render 
        (camera) mode and select the "Animation" button.
-   (G) To clear an armature animation, click on "Animation" under
-       "Armature1" in the upper left outline window using the right
-       mouse button and select "Clear Animation Data."
+   (G) Motion paths can be added for the end effector and target by
+       selecting each object in the 3D viewport's "Object Mode" and
+       enter "Calculate" in the "Animation" tabbed panel. Alternately,
+       each object may be selected in the upper right "Outliner" editor
+       window and "Update Paths" selected under Motion Path" in the
+       lower right "Properties" editor window if in object mode. Be sure
+       to set the frame limits to match those presented in the bottom
+       "Timeline" editor window.
+   (H) To clear armature and empty animations, click on "Animation"
+       under "Armature1" and "Empty" in the upper left "Outliner" editor
+       window using the right mouse button and select "Clear Animation
+       Data."
 
 NOTES:
 
