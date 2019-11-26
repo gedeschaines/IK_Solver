@@ -19,6 +19,7 @@
 %   ik_dls         - apply IK damped least squares technique
 %   solve_chk.m    - IK solver solution check
 %   time_to_goal.m - time to reach target
+%   closing_gain.m - compute closing gain
 %   jacobian.m     - compute Jacobian matrix
 %   rotation.m     - compute coordinate rotation matrix
 %   transform.m    - transform coordinates from local to world space  
@@ -88,7 +89,7 @@ n360rad = -360*rpd;
 p180rad =  180*rpd;
 n180rad = -180*rpd;
 
-Plot3D = 0;  % plot in 3D flag
+Plot3D = 1;  % plot in 3D flag
 Record = 0;  % record movie flag
 
 UseCCD   = 1;  % use cyclic coordinate descent
@@ -149,54 +150,66 @@ if Plot3D == 0
   a = {[0.0,0.0,0.0],...  % <- joint 1 + set of link chain attachment
        [2.0,0.0,0.0],...  % <- joint 2 | points in body coordinates,
        [2.0,0.0,0.0],...  % <- joint 3 | except for the base given in 
-       [1.0,0.0,0.0],...  % <- joint 4 / world space coordinates
+       [1.0,0.0,0.0],...  % <- joint 4 | world space coordinates
+       [0.0,0.0,0.0],...  % <- joint 5 /
        [1.0,0.0,0.0]};    % <- end effector
   u = {[0.0,0.0,1.0],...  % <- joint 1 + set of joint rotation axis unit
        [0.0,0.0,1.0],...  % <- joint 2 | vectors in link body coordinates
-       [0.0,0.0,1.0],...  % <- joint 3 | 
-       [0.0,0.0,1.0]};    % <- joint 4 /
+       [0.0,0.0,1.0],...  % <- joint 3 |
+       [1.0,0.0,0.0],...  % <- joint 4 |
+       [0.0,0.0,1.0]};    % <- joint 5 /
   q0    = [  25*rpd,...   % <- joint 1 + initial joint rotations (radians)
              15*rpd,...   % <- joint 2 |
              10*rpd,...   % <- joint 3 |
-              5*rpd];     % <- joint 4 /
+              0*rpd,...   % <- joint 4 |
+              5*rpd];     % <- joint 5 /
   qmin  = [-360*rpd,...   % <- joint 1 + joint minimum rotations (radians)
            -135*rpd,...   % <- joint 2 |
             -60*rpd,...   % <- joint 3 |
-            -60*rpd];     % <- joint 4 /
+           -360*rpd,...   % <- joint 4 |
+           -160*rpd];     % <- joint 5 /
   qmax  = [ 360*rpd,...   % <- joint 1 + joint maximum rotations (radians)
             135*rpd,...   % <- joint 2 |
              60*rpd,...   % <- joint 3 |
-             60*rpd];     % <- joitn 4 /
+            360*rpd,...   % <- joint 4 |
+            160*rpd];     % <- joitn 5 /
   dqlim = [  30*rpd,...   % <- joint 1 + joint delta rotation limit (rad/sec)
              30*rpd,...   % <- joint 2 |
              30*rpd,...   % <- joint 3 |
-             30*rpd];     % <- joitn 4 /
+             30*rpd,...   % <- joint 4 |
+             30*rpd];     % <- joitn 5 /
 else
   a = {[0.0,0.0,0.0],...  % <- joint 1 + set of link chain attachment
        [0.0,0.0,2.0],...  % <- joint 2 | points in body coordinates,
        [2.0,0.0,0.0],...  % <- joint 3 | except for the base given in 
-       [2.0,0.0,0.0],...  % <- joint 4 / world space coordinates
+       [2.0,0.0,0.0],...  % <- joint 4 | world space coordinates
+       [0.0,0.0,0.0],...  % <- joint 5 /
        [0.5,0.0,0.0]};    % <- end effector
   u = {[0.0,0.0,1.0],...  % <- joint 1 + set of joint rotation axis unit
        [0.0,1.0,0.0],...  % <- joint 2 | vectors in link body coordinates
        [0.0,1.0,0.0],...  % <- joint 3 | 
-       [0.0,1.0,0.0]};    % <- joint 4 /
+       [0.0,1.0,0.0],...  % <- joint 4 |
+       [0.0,0.0,1.0]};    % <- joint 5 /
   q0    = [   0*rpd,...   % <- joint 1 + initial joint rotations (radians)
             -45*rpd,...   % <- joint 2 |
              45*rpd,...   % <- joint 3 |
-              0*rpd];     % <- joint 4 /
+              0*rpd,...   % <- joint 4 |
+             45*rpd];     % <- joint 5 /
   qmin  = [-360*rpd,...   % <- joint 1 + joint minimum rotations (radians)
            -135*rpd,...   % <- joint 2 |
-           -130*rpd,...   % <- joint 3 |
-            -85*rpd];     % <- joint 4 /
+           -135*rpd,...   % <- joint 3 |
+            -85*rpd,...   % <- joint 4 |
+           -120*rpd];     % <- joint 5 /
   qmax  = [ 360*rpd,...   % <- joint 1 + joint maximum rotations (radians)
             135*rpd,...   % <- joint 2 |
             135*rpd,...   % <- joint 3 |
-             85*rpd];     % <- joitn 4 /
+             85*rpd,...   % <- joint 4 |
+            120*rpd];     % <- joitn 5 /
   dqlim = [  30*rpd,...   % <- joint 1 + joint delta rotation limit (rad/sec)
              30*rpd,...   % <- joint 2 |
              30*rpd,...   % <- joint 3 |
-             30*rpd];     % <- joitn 4 /
+             30*rpd,...   % <- joint 4 |
+             30*rpd];     % <- joitn 5 /
 end
 na = length(a);   % number of link body attachment points
 np = na;          % number of link attachment world positions
@@ -227,7 +240,7 @@ if Plot3D == 0
   et = [ 3.0, 4.0, 0.0];  % end effector target position vector
   vt = [-0.1, 0.0, 0.0];  % target velocity vector
 else
-  et = [ 3.0, 3.0, 2.0];  % end effector target position vector
+  et = [ 3.0, 2.5, 2.0];  % end effector target position vector
   vt = [ 0.0,-0.2, 0.0];  % target velocity vector
 end
 
@@ -262,7 +275,6 @@ if Plot3D == 0
   text_x = -6.0;
   text_y =  6.5;
 else
-  et = [4.0, 0.0, 2.0];
   [X0,Y0,Z0] = plot_xyz(np,p);
   ViewAz = 45.0;
   ViewEl = 45.0;
@@ -335,22 +347,29 @@ while button == 1
   while solve_chk(ni,ilim,p,ec,et,dxy,dz,derr,perr) == 0
     % Calculate IK solution
     if IKmethod == UseCCD
-      dq = zeros(1,nq);
+      gain = closing_gain(IKmethod,ec,et,vt);
+      ept  = et + gain*tgo*vt;
+      dq   = zeros(1,nq);
       for i = nq:-1:1
-        pt    = et + tgo*vt - p{i};
-        npt   = norm(pt);
-        pc    = ec - p{i};
-        npc   = norm(pc);
-        ut    = cross(cross(w{i},pc/npc), cross(w{i},pt/npt));
-        ut    = ut/norm(ut);
-        dqmax = min([acos((pt*(pc/npc).')/norm(pt)),dqlim(i)]);
-        dq(i) = dqmax*(ut*(w{i}).');
+        pt  = ept - p{i};
+        npt = norm(pt);
+        pc  = ec - p{i};
+        npc = norm(pc);
+        ut  = cross(cross(w{i},pc/npc), cross(w{i},pt/npt));
+        if norm(ut) > 0
+          ut    = ut/norm(ut);
+          dqmax = min([acos((pt*(pc/npc).')/norm(pt)),dqlim(i)]);
+          dq(i) = dqmax*(ut*(w{i}).');
+        else
+          dq(i) = 0.0;
+        end
       end
     else
-      de = et + tgo*vt - ec;
-      % Jt = jacobian(nq,w,p,et);
-      Jc = jacobian(nq,w,p,ec);
-      J  = Jc;
+      gain = closing_gain(IKmethod,ec,et,vt);
+      de   = et + gain*tgo*vt - ec;
+      % Jt   = jacobian(nq,w,p,et);
+      Jc   = jacobian(nq,w,p,ec);
+      J    = Jc;
       switch IKmethod
         case UseJTM
           [dq] = ik_jtm(J,de,dqlim);
@@ -368,10 +387,11 @@ while button == 1
     [p,w] = transform(na,q,u,a);
     %angle_chk(q,u,p,et);
     % Update end effector current and target positions
-    ec  = p{na};
-    et  = et + h*vt;
-    tgo = time_to_goal(et,vt,w,p,dq);
-    pt  = et + tgo*vt;
+    ec   = p{na};
+    et   = et + h*vt;
+    tgo  = time_to_goal(et,vt,w,p,dq);
+    gain = closing_gain(IKmethod,ec,et,vt);
+    pt   = et + gain*tgo*vt;
     % Increment iteration and simulation time counters
     ni   = ni + 1;
     tsim = tsim + h;
