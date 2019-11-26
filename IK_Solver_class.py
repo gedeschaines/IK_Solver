@@ -287,7 +287,7 @@ class IK_Solver:
           ept = self.et + gain*self.tgo*self.vt
           self.dq = np.zeros(self.nq)
           for i in range(self.nq-1,-1,-1) :
-            pt  =  ept - self.p[i]
+            pt  = ept - self.p[i]
             npt = la.norm(pt)
             pc  = self.ec - self.p[i]
             npc = la.norm(pc)
