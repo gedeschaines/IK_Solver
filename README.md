@@ -139,19 +139,19 @@ of the program's development and maintenance.
 \[1] Benjamin Kenwright, "Practical 01: Inverse Kinematics", September
      2014, School of Computer Science, Edinburgh Napier University,
      United Kingdom, Physics-Based Animation practical web available at
-     http://games.soc.napier.ac.uk/study/pba_practicals/Practical%2001%20-%20Inverse%20Kinematics.pdf
+     <http://games.soc.napier.ac.uk/study/pba_practicals/Practical%2001%20-%20Inverse%20Kinematics.pdf>
 
 \[2] Ben Kenwright, "Real-Time Character Inverse Kinematics using
      the Gauss-Seidel Iterative Approximation Method", July 2012,
      CONTENT 2012, The Fourth International Conference on Creative
      Content Technologies, web available at
-     http://www.thinkmind.org/index.php?view=article&articleid=content_2012_4_10_60013
+     <http://www.thinkmind.org/index.php?view=article&articleid=content_2012_4_10_60013>
 
 \[3] Samuel R. Buss, "Introduction to Inverse Kinematics with Jacobian
      Transpose, Pseudoinverse and Damped Least Squares methods", October
      2009, Department of Mathematics, University of California, San
      Diego, unpublished article web available at
-     http://www.math.ucsd.edu/~sbuss/ResearchWeb/ikmethods/iksurvey.pdf
+     <http://www.math.ucsd.edu/~sbuss/ResearchWeb/ikmethods/iksurvey.pdf>
 
 These reference documents are provided in the ./refs subdirectory in the event
 their associated web links are broken. For additional reference information,
