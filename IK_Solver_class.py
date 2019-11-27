@@ -162,6 +162,9 @@ class IK_Solver:
   def null_space_control(self):
     """
     IK solver class - null space control vector computation function
+
+    NOTE: This function is taiored specifically to hardcoded n-link
+          chains defined in IK_Solver_nlink.py
     """
     if self.Plot3D == 0 :
       '''
@@ -328,7 +331,7 @@ class IK_Solver:
         self.q = self.q + self.h*self.dq
         self.q = clamp_rot(self.nq,self.q,self.qmin,self.qmax)
         (self.p,self.w) = transform(self.na,self.q,self.u,self.a)
-        #angle_chk(self.q,self.u,self.p,self.et)
+        ##angle_chk(self.q,self.u,self.p,self.et)
         # Update end effector current and target positions
         self.ec  = self.p[self.ia]
         self.et  = self.et + self.h*self.vt
