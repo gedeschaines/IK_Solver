@@ -22,19 +22,21 @@ else
   detxy = norm(etp(1:2));  % distance from base to target in xy plane
   detz = abs(etp(3));      % distance from base to target in z direction
   decxy = norm(ecp(1:2));  % distance from base to effector in xy plane
-  dotxy = (ecp(1:2)*etp(1:2).')/detxy;  % portion of ecp along etp in xy plane
+  dotxy = dot(ecp(1:2),etp(1:2))/detxy;  % portion of ecp along etp in xy plane
 
   if ((detxy - dxy) > derr) || ((detz - dz) > derr)
     % target currently beyond reach of effector; but is it
     % within allowable distance and xy pointing error?
     if (abs(decxy-dxy) <= derr) && (acos(dotxy/decxy) <= perr)
       i = 1;
-    end 
+      fprintf('Encountered done condition 1.\n')
+    end
   else
     % target currently not beyond reach of effector; but is it
     % within allowable distance?
     if norm(et-ec) <= derr
       i = 1;
+      fprintf('Encountered done condition 2.\n')
     end
   end
   
