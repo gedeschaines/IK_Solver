@@ -7,7 +7,7 @@ Desc: Instructions on using Blender with fourlink3d.blend
 
 For this Blender model, the motion of a 3D four link serial chain
 (actually 5 links but only 4 visible) comprised of revolute joints 
-defined in the scripts/IK_Solver_nlink.py file is determined by 
+defined in the IK_Solver/IK_Solver_nlink.py file is determined by
 application of "Damped Least Squares" algorithm from the initial
 manipulator arm orientation to that obtained when the end effector
 is placed sufficiently close to the predicted intercept point of a
@@ -59,7 +59,7 @@ IK_Solver/README.txt file.
        a connection to the IK_Solver Server and create frame 0.
        Should see the robot move to it's initial state in the 3D 
        View window pane, and the following messages displayed in 
-       the terminal window in which the IK_Solver Server was 
+       the terminal window in which the IK_Solver Server was
        started:
          ...connected from: 127.0.0.1:port#
          Starting IK_Solver (Client3D=1,IKmethod=7)
@@ -76,7 +76,7 @@ IK_Solver/README.txt file.
 4) To view keyframes of robot motion in Blender.
 
    (A) The middle-left window pane must be a "3D View" type.
-   (B) The 3D-View mode must be in "Object Mode".
+   (B) The 3D-View mode must be "Object Mode".
    (C) The active (selected) object should be "Armature1" if
        Layer 1 is selected.
    (D) Change the lower-left window pane to "Timeline" type.
