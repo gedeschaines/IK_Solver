@@ -163,7 +163,7 @@ class IK_Solver:
     """
     IK solver class - null space control vector computation function
 
-    NOTE: This function is taiored specifically to hardcoded n-link
+    NOTE: This function is tailored specifically to hardcoded n-link
           chains defined in IK_Solver_nlink.py
     """
     if self.Plot3D == 0 :
