@@ -12,22 +12,27 @@
 % damped least squares (DLS) [3] as detailed in the listed references.
 % The program is comprised of the following script files.
 %
-%   IK_Solver.m    - main program utilizing the following functions:
-%   ik_jtm.m       - apply IK Jacobian transpose method
-%   ik_pim2.m      - apply IK pseudo-inverse method from ref [2]
-%   ik_pim3.m      - apply IK pseudo-inverse method from ref [3]
-%   ik_dls         - apply IK damped least squares technique
-%   solve_chk.m    - IK solver solution check
-%   time_to_goal.m - time to reach target
-%   closing_gain.m - compute closing gain
-%   jacobian.m     - compute Jacobian matrix
-%   rotation.m     - compute coordinate rotation matrix
-%   transform.m    - transform coordinates from local to world space  
-%   clamp_rot.m    - clamp joint rotations to specified limits
-%   plot_xy.m      - extract link plot x,y coordinates for 2D plotting
-%   plot_xyz.m     - extract link plot x,y,z coordinates for 3D plotting
-%   angle_chk.m    - debug display of joint rotation angle checks
-%   isOctave.m     - returns true if script is being executed by Octave
+%   IK_Solver.m          - main program utilizing the following functions:
+%   ik_jtm.m             - apply IK Jacobian transpose method
+%   ik_pim2.m            - apply IK pseudo-inverse method from ref [2]
+%   ik_pim3.m            - apply IK pseudo-inverse method from ref [3]
+%   ik_dls               - apply IK damped least squares technique
+%   solve_chk.m          - IK solver solution check
+%   time_to_goal.m       - time to reach target
+%   closing_gain.m       - compute closing gain
+%   get_endeff_rot.m     - get end effector rotation in 2D space
+%   get_endeff_ypr.m     - get end effector yaw, pitch, roll in 3D space
+%   avelT_wrt_jointm.m   - ang. vel. of target wrt to joint m
+%   avelE_wrt_jointm.m   - ang. vel. of end effector wrt to joint m
+%   null_space_control.m - compute null space control vector
+%   jacobian.m           - compute Jacobian matrix
+%   rotation.m           - compute coordinate rotation matrix
+%   transform.m          - transform coordinates from local to world space
+%   clamp_rot.m          - clamp joint rotations to specified limits
+%   plot_xy.m            - extract link plot x,y coordinates for 2D plotting
+%   plot_xyz.m           - extract link plot x,y,z coordinates for 3D plotting
+%   angle_chk.m          - debug display of joint rotation angle checks
+%   isOctave.m           - returns true if script is being executed by Octave
 %
 %   The following functions are not required by MATLAB, but are used
 %   by Octave to emulate MATLAB getframe and movie2avi functions. These
@@ -92,14 +97,16 @@ n180rad = -180*rpd;
 Plot3D = 1;  % plot in 3D flag
 Record = 0;  % record movie flag
 
-UseCCD   = 1;  % use cyclic coordinate descent
-UseJTM   = 2;  % use jacobian transpose method
-UsePIM2  = 3;  % use pseudo-inverse method from ref [2]
-UsePIM3  = 4;  % use pseudo-inverse method from ref [3]
-UseDLS   = 5;  % use damped least squares from ref [3]
-IKmethod = 0;  % selected IK solver method
+UseCCD    = 1;  % use cyclic coordinate descent
+UseJTM    = 2;  % use jacobian transpose method
+UsePIM2   = 3;  % use pseudo-inverse method from ref [2]
+UsePIM3   = 4;  % use pseudo-inverse method from ref [3]
+UseDLS    = 5;  % use damped least squares from ref [3]
+UsePIM3dH = 6;  % use pseudo-inverse method from ref [3] with null space control
+UseDLSdH  = 7;  % use damped least squares from ref [3] with null space control
+IKmethod  = 0;  % selected IK solver method
 
-prompt = 'Select IK Solver (1=CCD,2=JTM,3=PIM2,4=PIM3,5=DLS)? ';
+prompt = 'Select IK Solver (1=CCD,2=JTM,3=PIM2,4=PIM3,5=DLS,6=PIM3dH,7=DLSdH)? ';
 while IKmethod == 0
   str = input(prompt,'s');  
   switch str
@@ -118,6 +125,12 @@ while IKmethod == 0
     case '5'
       title = 'IK_Solver - Using Damped Least Squares [ref 3]';
       IKmethod = UseDLS;
+    case '6'
+      title = 'IK_Solver - Using Pseudo-Inverse Method [ref 3] with null space control';
+      IKmethod = UsePIM3dH;
+    case '7'
+      title = 'IK_Solver - Using Damped Least Squares [ref 3] with null space control';
+      IKmethod = UseDLSdH;
     otherwise
       fprintf('Invalid entry\n');
       IKmethod = 0;
@@ -232,6 +245,7 @@ else
 end
 
 q     = q0;                   % vector of current joint rotations
+dq    = zeros(1,nq);          % joint rotation rate vector
 [p,w] = transform(na,q,u,a);  % joint positions/rotations in world space
 ec    = p{na};                % end effector current position vector
 
@@ -379,13 +393,19 @@ while button == 1
           [dq] = ik_pim3(J,de,sfac,dqlim,dH);
         case UseDLS
           [dq] = ik_dls(J,de,slam,dqlim,dH);
+        case UsePIM3dH
+          [dH] = null_space_control(Plot3D,et,vt,w,p,dq,q,u);
+          [dq] = ik_pim3(J,de,sfac,dqlim,dH);
+        case UseDLSdH
+          [dH] = null_space_control(Plot3D,et,vt,w,p,dq,q,u);
+          [dq] = ik_dls(J,de,slam,dqlim,dH);
       end
     end
     % Update link chain angles and positions
     q     = q + h*dq;
     [q]   = clamp_rot(nq,q,qmin,qmax);
     [p,w] = transform(na,q,u,a);
-    %angle_chk(q,u,p,et);
+    %%angle_chk(q,u,p,et);
     % Update end effector current and target positions
     ec   = p{na};
     et   = et + h*vt;
@@ -440,6 +460,14 @@ while button == 1
   fprintf('Iteration time (sec) = %8.3f\nEffector position error = %8.4f\n',...
                   tsim, error);
   if Plot3D == 0
+    theta = get_endeff_rot(nq,q,u);
+    fprintf('Effector rotation angle = %8.3f\n', theta*dpr)
+  else
+    [psi,theta,phi] = get_endeff_ypr(nq,q,u);
+    fprintf('Effector yaw,pitch,roll = %8.3f, %8.3f, %8.3f\n',...
+                  psi*dpr, theta*dpr, phi*dpr)
+  end
+  if Plot3D == 0
     [X,Y] = plot_xy(np,p);
     if isOctave
       plot([X0(na),et(1)],[Y0(na),et(2)],' -k', ...
@@ -492,6 +520,8 @@ while button == 1
   ni   = 0;
   tsim = 0.0;
   tgo  = h;
+  dq   = zeros(1,nq);          % joint rotation rate vector
+  dH   = zeros(1,nq);          % null space control vector
 end % end of button press loop
 
 %% Animation playback
