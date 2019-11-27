@@ -34,7 +34,7 @@ vTJ = vt - vJ;
 % direction vector to target from joint m
 vecp = pt - p{m};
 nrmp = norm(vecp);
-# angular velocity of the targer wrt to joint m
+% angular velocity of the targer wrt to joint m
 avel = cross(vecp,vTJ)/(nrmp*nrmp);
 
 end
