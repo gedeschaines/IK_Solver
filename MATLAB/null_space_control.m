@@ -3,8 +3,8 @@ function [dH] = null_space_control(P3D,et,vt,w,p,dq,q,u)
 % function [dH] = null_space_control(P3D,et,vt,w,p,dq,q,u) : computes and returns
 %                                                            null space control vector
 %
-%   NOTE: This function is taiored specifically to hardcoded n-link
-%         chains defined in IK_Solver_nlink.py
+%   NOTE: This function is tailored specifically to hardcoded n-link
+%         chains defined in IK_Solver.m
 %
 %   P3D = Plot3D
 %   et  = position of target in world space
