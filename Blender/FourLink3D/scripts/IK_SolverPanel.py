@@ -27,6 +27,17 @@ lastTime   = -1.0
 targetLoc  = mu.Vector((0.0,0.0,0.0))
 endeffLoc  = mu.Vector((0.0,0.0,0.0))
 
+### Time text display handler
+
+scene = bpy.context.scene
+ttobj = scene.objects['Text_Time']
+
+def time_text(scene):
+    fps = scene.render.fps / scene.render.fps_base  # actual framerate
+    ttobj.data.body = 'Time: {0: 6.3f} secs'.format(scene.frame_current/fps)
+
+bpy.app.handlers.frame_change_pre.append(time_text)
+
 ### Data pack/unpack functions
 
 def pack_target_pos(buffer,x,y,z):
@@ -141,7 +152,7 @@ def updateIK(n, armature):
     # Check for IK Solver iterations completed.
     if abs(time-lastTime) < 0.001 : return True
     lastTime = time
-    
+        
     # Update orientations of armature bones.
     k = 0
     for bone in armature.pose.bones:
