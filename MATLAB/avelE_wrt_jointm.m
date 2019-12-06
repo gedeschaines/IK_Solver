@@ -1,10 +1,11 @@
 function [avel] = avelE_wrt_jointm(w,p,dq,m)
 
 % function [avel] = avelE_wrt_jointm(w,p,dq,m) : returns angular velocity of
-%                                                end-effector with respect to
-%                                                joint m, assuming the first
-%                                                joint position is fixed in
-%                                                world space.
+%                                                line-of-sight for end-effector
+%                                                with respect to joint m,
+%                                                assuming the first joint 
+%                                                position is fixed in world
+%                                                space.
 %   w  = set of n joint rotation direction vectors in world space
 %   p  = set of n+1 position vectors (n joints + end-effector) in world space
 %   dq = vector of n joint rotation rates (radians/sec)
@@ -36,7 +37,7 @@ vEJ = vE - vJ;
 % direction vector to end-effector from joint m
 vecp = p{ie} - p{m};
 nrmp = norm(vecp);
-% angular velocity of end-effector wrt joint m
+% line-of-sight angular velocity for end-effector wrt joint m
 avel = cross(vecp,vEJ)/(nrmp*nrmp);
 
 end

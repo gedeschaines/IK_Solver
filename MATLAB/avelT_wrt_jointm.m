@@ -1,10 +1,11 @@
 function [avel] = avelT_wrt_jointm(pt,vt,w,p,dq,m)
 
 % function [avel] = avelT_wrt_jointm(pt,vt,w,p,dq,m) : returns angular velocity of
-%                                                      the target with respect to
-%                                                      joint m, assuming the first
-%                                                      joint position is fixed in
-%                                                      world space.
+%                                                      line-of-sight for the target
+%                                                      with respect to joint m,
+%                                                      assuming the first joint
+%                                                      position is fixed in world
+%                                                      space.
 %   pt = current position of target in world space
 %   vt = current velocity of target in world space
 %   w  = set of n joint rotation direction vectors in world space
@@ -34,7 +35,7 @@ vTJ = vt - vJ;
 % direction vector to target from joint m
 vecp = pt - p{m};
 nrmp = norm(vecp);
-% angular velocity of the targer wrt to joint m
+% line-of-sight angular velocity for target wrt joint m
 avel = cross(vecp,vTJ)/(nrmp*nrmp);
 
 end

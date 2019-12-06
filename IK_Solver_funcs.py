@@ -348,10 +348,10 @@ def closing_gain(ikm,ec,pt,vt):
 def avelT_wrt_jointm(pt,vt,w,p,dq,m):
   """
   function [avel] = avelT_wrt_jointm(pt,vt,w,p,dq,m) : returns angular velocity of
-                                                       the target with respect to
-                                                       joint m, assuming joint 1's
-                                                       position is fixed in world 
-                                                       space.
+                                                       line-of-sight for the target
+                                                       with respect to joint m,
+                                                       assuming joint 1's position
+                                                       is fixed in world space.
     pt = current position of target in world space
     vt = current velocity of target in world space
     w  = set of n joint rotation direction vectors in world space
@@ -367,8 +367,8 @@ def avelT_wrt_jointm(pt,vt,w,p,dq,m):
     print("%s in %s: %s" % (ename, fname, err) )
     sys.exit()
     
-  n  = len(dq)
-  ie = len(p) - 1
+  n  = len(dq)     # number of joints
+  ie = len(p) - 1  # index of end effector position vector
   # absolute velocity of joint m 
   vJ = np.zeros(3)
   for i in range(0,m-1,1) :
@@ -378,17 +378,17 @@ def avelT_wrt_jointm(pt,vt,w,p,dq,m):
   # direction vector to target from joint m
   vecp = pt - p[m-1]
   nrmp = la.norm(vecp)
-  # angular velocity of the targer wrt to joint m
+  # line-of-sight angular velocity for target wrt to joint m
   avel = np.cross(vecp,vTJ)/(nrmp*nrmp)
   return avel
 
 def avelE_wrt_jointm(w,p,dq,m):
   """
   function [avel] = avelE_wrt_jointm(w,p,dq,m) : returns angular velocity of
-                                                 end-effector with respect to 
-                                                 joint m, assuming joint 1's
-                                                 position is fixed in world 
-                                                 space.
+                                                 line-of-sight for end-effector
+                                                 with respect to  joint m,
+                                                 assuming joint 1's position
+                                                 is fixed in world space.
     w  = set of n joint rotation direction vectors in world space
     p  = set of n+1 position vectors (n joints + end-effector) in world space
     dq = vector of n joint rotation rates (radians/sec)
@@ -402,8 +402,8 @@ def avelE_wrt_jointm(w,p,dq,m):
     print("%s in %s: %s" % (ename, fname, err) )
     sys.exit()
     
-  n  = len(dq)
-  ie = len(p) - 1
+  n  = len(dq)     # number of joints
+  ie = len(p) - 1  # index of end effector position vector
   # absolute velocity of end-effector
   vE = np.zeros(3)
   for i in range(n-1,-1,-1) :
@@ -417,7 +417,7 @@ def avelE_wrt_jointm(w,p,dq,m):
   # direction vector to end-effector from joint m
   vecp = p[ie] - p[m-1]
   nrmp = la.norm(vecp)
-  # angular velocity of end-effector wrt joint m
+  # line-of-sight angular velocity for end-effector wrt joint m
   avel = np.cross(vecp,vEJ)/(nrmp*nrmp)
   return avel
 
