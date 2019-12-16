@@ -12,7 +12,7 @@ and Python versions listed in the following table.
     ------  -------  ------
      14.04    2.74    3.4.2
      16.04    2.74    3.4.2
-     18.04    2.81    3.7.4
+     18.04    2.81    3.7.4  (Blender Game Engine not supported as of v2.8)
 
 FourLink3D.blend - inverse kinematics solved using the IK_Solver program
 ------------------------------------------------------------------------
