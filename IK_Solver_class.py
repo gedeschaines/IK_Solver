@@ -137,6 +137,16 @@ class IK_Solver:
     self.Z0     = np.zeros(len(self.p))     # link chain initial y coordinates
     self.set_points_x0y0z0()
   
+    # compute closest horizontal approach distance of target to link chain base
+    etp = self.et - self.p[0]    # vector from link chain base to target
+    nvt = la.norm(self.vt[0:2])  # norm of horizontal component of target velocity
+    if nvt > 0.0 :
+       uvt = self.vt[0:2]/nvt
+    else :
+       uvt = np.array([0.0, 0.0])
+    self.dxymin = la.norm(etp[0:2] - np.dot(etp[0:2], uvt)*uvt)
+    
+    # set random number generator seed 
     random.seed(987654321)
     
   def zero(self):
@@ -249,6 +259,9 @@ class IK_Solver:
       if (abs(decxy - self.dxy) > self.derr) or \
          (np.arccos(dotxy/decxy) > self.perr) :
         return False
+      # could end-effector reach target at its closest horizontal approach?
+      if (self.dxy > self.dxymin) :
+        return False 
       print("Encountered done condition 1.")
     else :
       # target currently not beyond reach of effector; but is it
