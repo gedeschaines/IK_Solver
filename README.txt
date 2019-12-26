@@ -14,7 +14,7 @@ as a single executable program, or as client/server programs.
      
    where the command line arguments $1, $2 and $3 can be as follows. 
      
-     $1 - The IK solver method option [1,2,3,4,5] where:
+     $1 - The IK solver method option [1,2,3,4,5,6,7] where:
             1 = Cyclic Coordinate Descent (CCD)
             2 = Jacobian Transpose Method (JTM)
             3 = Pseudo-inverse Jacobian method 2 (PIM2)
