@@ -44,7 +44,7 @@ In Blender Render mode, motion of the end effector target along its NURB curve p
 is controlled by animation keyframe buttons in a Timeline editor panel. The frame
 count from 0 to 500 as the target moves from its initial to final position along
 the target path represents 40 seconds at 12.5 FPS; which corresponds to a target
-vecocity of 0.2 units/seconds (8 units traversed in 40 seconds).
+velocity of 0.2 units/seconds (8 units traversed in 40 seconds).
 
 The ./FourLink3D_BGE/scripts/timeText.py script is run once while in Blender Render
 mode to register a handler for animating frame time text in the 3D viewport.
