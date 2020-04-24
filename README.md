@@ -139,7 +139,8 @@ of the program's development and maintenance.
 \[1] Benjamin Kenwright, "Practical 01: Inverse Kinematics", September
      2014, School of Computer Science, Edinburgh Napier University,
      United Kingdom, Physics-Based Animation practical web available at
-     <http://games.soc.napier.ac.uk/study/pba_practicals/Practical%2001%20-%20Inverse%20Kinematics.pdf>
+     <http://games.soc.napier.ac.uk/study/pba_practicals/Practical%2001%20-%20Inverse%20Kinematics.pdf>  
+     (2016 publication: <https://github.com/edinburgh-napier/set09119/blob/master/workbook.pdf>)
 
 \[2] Ben Kenwright, "Real-Time Character Inverse Kinematics using
      the Gauss-Seidel Iterative Approximation Method", July 2012,
@@ -156,7 +157,7 @@ of the program's development and maintenance.
 These reference documents are provided in the ./refs subdirectory in the event
 their associated web links are broken. For additional reference information,
 software, demos and tutorials on physics-based animation, inverse kinematics
-and 3D computer graphics see Ben Kenwright's [XBDEV.NET](http://www.xbdev.net/index.php)
+and 3D computer graphics see Ben Kenwright's [XBDEV.NET](http://www.xbdev.net/physics/Book/index.php)
 website, Edinburgh Napier University Games Development [Resources](http://games.soc.napier.ac.uk/resources.html), and Sam Buss's [Publications and Other Research](http://www.math.ucsd.edu/~sbuss/ResearchWeb/index.html) web page.
 
 #### Disclaimers ####
