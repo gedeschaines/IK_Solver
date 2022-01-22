@@ -16,7 +16,7 @@ The following images and hyperlinked video clips depict the motion of two dimens
 (2D) and three dimensional (3D) five revolute joint, 4-link serial chains (blue line)
 as the end-effector moves from its initial position (green line) towards a moving target
 (red x). Although 14 simulation seconds (140 frames \@ 10FPS) are shown, it only took
-2.8 and 5.44 seconds for the 2D and 3D link chains respectively to reach the target. In
+2.52 and 5.44 seconds for the 2D and 3D link chains respectively to reach the target. In
 both cases the end-effector moves to a predicted intercept point (magenta x) along the
 target's path of motion. Joint rotation clamping and rotation rate limiting are utilized
 to provide a more realistic simulation of the link chain's movement. Even though only
