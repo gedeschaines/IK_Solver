@@ -20,6 +20,8 @@
 #
 #   time_to_goal     - estimates time for end-effector to reach the 
 #                      target goal
+#   closing_gain     - closing gain for end effector motion toward
+#                      target
 #   avelT_wrt_jointm - angular velocity of the target with respect
 #                      to joint m
 #   avelE_wrt_jointm - angular velocity of end-effector with respect
@@ -200,7 +202,7 @@ def ik_pim3(J,de,sfac,dqlim,phi):
   """
   try:
     U,s,Vh = la.svd(J, full_matrices=True)  # NOTE: Vh here is V' in MATLAB
-  except LinAlgError :
+  except la.LinAlgError :
     print("SVD computation does not converge.")
     
   (m,n) = J.shape
@@ -240,7 +242,7 @@ def ik_dls(J,de,slam,dqlim,phi):
   """
   try:
     U,s,Vh = la.svd(J,full_matrices=True)  # NOTE: Vh here is V' in MATLAB
-  except LinAlgError :
+  except la.LinAlgError :
     print("SVD computation does not converge.")
     
   (m,n) = J.shape
@@ -290,7 +292,7 @@ def clamp_rot(n,r,rmin,rmax):
 
 def time_to_goal(pt,vt,w,p,dq):
   """
-  function [avel] = time_to_goal(pt,vt,w,p,dq) : returns estimated time for
+  function [tgo] = time_to_goal(pt,vt,w,p,dq) : returns estimated time for
                                                  end-effector to reach the 
                                                  target goal
     pt = current position of target in world space
@@ -312,18 +314,44 @@ def time_to_goal(pt,vt,w,p,dq):
   if nrmp > 0.0 :
     vecn = vecp/nrmp
     tgo  = nrmp/(np.dot(ve-vt,vecn))
-    if tgo < 0.0 : tgo = 0.0
+    if tgo < 0.0 :
+      tgo = 0.0
   else :
     tgo = 0.0
   return tgo
 
+def closing_gain(ikm,ec,pt,vt):
+  """
+  function [gain] = closing_gain(ikm,ec,pt,vt) : returns end effector closing gain
+    ikm = IKmethod
+    ec  = end effector current position in world space
+    pt  = position of target in world space
+    vt  = velocity of target in world space
+  """
+  de  = ec - pt
+  nde = la.norm(de)
+  nvt = la.norm(vt)
+  if (nde == 0.0) or (nvt == 0.0) :
+    gain = 1.0
+  else :
+    # compute cosine of approach angle relative to target velocity vector
+    aacos = np.dot(de/nde, vt/nvt)
+    if aacos <= 0.0 :
+      gain = 1.6
+    elif aacos <= 0.7071 :
+      gain = 1.2
+    else :
+      if ikm < 6 : gain = 1.0  # without null space control
+      else       : gain = 0.8  # with null space control
+  return gain
+
 def avelT_wrt_jointm(pt,vt,w,p,dq,m):
   """
   function [avel] = avelT_wrt_jointm(pt,vt,w,p,dq,m) : returns angular velocity of
-                                                       the target with respect to
-                                                       joint m, assuming joint 1's
-                                                       position is fixed in world 
-                                                       space.
+                                                       line-of-sight for the target
+                                                       with respect to joint m,
+                                                       assuming joint 1's position
+                                                       is fixed in world space.
     pt = current position of target in world space
     vt = current velocity of target in world space
     w  = set of n joint rotation direction vectors in world space
@@ -333,14 +361,14 @@ def avelT_wrt_jointm(pt,vt,w,p,dq,m):
   """
   try :
     assert m-1 in range(len(dq)), 'value of m-1 not in range(len(dq))' 
-  except (AssertionError, args) :
-    ename = args.__class__.__name__
+  except AssertionError as err :
+    ename = err.__class__.__name__
     fname = 'avelT_wrt_jointm'
-    print("%s in %s: %s" % (ename, fname, args) )
+    print("%s in %s: %s" % (ename, fname, err) )
     sys.exit()
     
-  n  = len(dq)
-  ie = len(p) - 1
+  n  = len(dq)     # number of joints
+  ie = len(p) - 1  # index of end effector position vector
   # absolute velocity of joint m 
   vJ = np.zeros(3)
   for i in range(0,m-1,1) :
@@ -350,17 +378,17 @@ def avelT_wrt_jointm(pt,vt,w,p,dq,m):
   # direction vector to target from joint m
   vecp = pt - p[m-1]
   nrmp = la.norm(vecp)
-  # angular velocity of the targer wrt to joint m
+  # line-of-sight angular velocity for target wrt to joint m
   avel = np.cross(vecp,vTJ)/(nrmp*nrmp)
   return avel
 
 def avelE_wrt_jointm(w,p,dq,m):
   """
   function [avel] = avelE_wrt_jointm(w,p,dq,m) : returns angular velocity of
-                                                 end-effector with respect to 
-                                                 joint m, assuming joint 1's
-                                                 position is fixed in world 
-                                                 space.
+                                                 line-of-sight for end-effector
+                                                 with respect to  joint m,
+                                                 assuming joint 1's position
+                                                 is fixed in world space.
     w  = set of n joint rotation direction vectors in world space
     p  = set of n+1 position vectors (n joints + end-effector) in world space
     dq = vector of n joint rotation rates (radians/sec)
@@ -368,14 +396,14 @@ def avelE_wrt_jointm(w,p,dq,m):
   """
   try :
     assert m-1 in range(len(dq)), 'value of m-1 not in range(len(dq))' 
-  except (AssertionError, args) :
-    ename = args.__class__.__name__
+  except AssertionError as err :
+    ename = err.__class__.__name__
     fname = 'avelE_wrt_jointm'
-    print("%s in %s: %s" % (ename, fname, args) )
+    print("%s in %s: %s" % (ename, fname, err) )
     sys.exit()
     
-  n  = len(dq)
-  ie = len(p) - 1
+  n  = len(dq)     # number of joints
+  ie = len(p) - 1  # index of end effector position vector
   # absolute velocity of end-effector
   vE = np.zeros(3)
   for i in range(n-1,-1,-1) :
@@ -389,7 +417,7 @@ def avelE_wrt_jointm(w,p,dq,m):
   # direction vector to end-effector from joint m
   vecp = p[ie] - p[m-1]
   nrmp = la.norm(vecp)
-  # angular velocity of end-effector wrt joint m
+  # line-of-sight angular velocity for end-effector wrt joint m
   avel = np.cross(vecp,vEJ)/(nrmp*nrmp)
   return avel
 
@@ -423,4 +451,3 @@ def angle_chk(q,u,p,et):
   atI = np.arccos(np.dot(ept,ux)/npt)*dpr
   print("angle to target from joint %1d x-axis          = %12.6f" % (n,at3) )
   print("angle to target from inertial x-axis         = %12.6f" % (atI) )
-

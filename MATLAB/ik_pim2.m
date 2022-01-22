@@ -6,15 +6,15 @@ function [dq] = ik_pim2(J,de,sdel,dqlim)
 %   J     = Jacobian matrix of de/dq
 %   de    = vector of delta errors
 %   sdel  = singularity prevention damping constant
-%   dtlim = joint rotation delta limit
+%   dtlim = vector of joint rotation delta limits
 
 n     = size(J,2);
-A     = J'*J + sdel*eye(n);
-b     = J'*de';
-dq    = (A \ b)';
+A     = J.'*J + sdel*eye(n);
+b     = J.'*de.';
+dq    = (A \ b).';
 dqmax = max(abs(dq));
-if dqmax > dqlim
-  dq = (dqlim/dqmax)*dq;
+if dqmax > dqlim(1)
+  dq = (dqlim(1)/dqmax)*dq;
 end
 
 end

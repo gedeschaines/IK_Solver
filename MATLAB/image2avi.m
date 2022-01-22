@@ -6,17 +6,23 @@ function [status] = image2avi (fmt, fps, w, h, name)
 %%
 %% see putimage
 
-ffmt = "-y -f image2 ";
-imgs = sprintf ("-i ./images/%ss/img_%s.%s ", fmt, '%04d', fmt);
-rate = sprintf ("-r %d ", fps);
-size = sprintf ("-s %dx%d ", w,  h);
-rdir = " 2>&1";
-scmd = ["/usr/bin/avconv ", ffmt, imgs, rate, size, name, rdir];
+if exist("/usr/bin/avconv", 'file')
+  ffmt = "-y -f image2 ";
+  rate = sprintf ("-r %d ", fps);
+  imgs = sprintf ("-i ./images/%ss/img_%s.%s ", fmt, '%04d', fmt);
+  cdec = "-c mjpeg ";
+  imsz = sprintf ("-s %dx%d ", w,  h);
+  rdir = " 2>&1";
+  scmd = ["/usr/bin/avconv ", ffmt, rate, imgs, cdec, rate, imsz, name, rdir];
 
-[status, output] = system (scmd, true, "sync");
+  [status, output] = system (scmd, true, "sync");
 
-if status ~= 0
-  printf ("%s", output);
+  if status ~= 0
+    printf ("%s", output);
+  end
+
+else
+  printf ("requires avconv libav-tool to create movie.\n");
 end
 
 endfunction

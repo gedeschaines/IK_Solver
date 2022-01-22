@@ -62,7 +62,7 @@ def get_nlink_chain(Plot3D) :
                          60*rpd,  # <- joint 3 |
                         360*rpd,  # <- joint 4 |
                         160*rpd]) # <- joint 5 /
-    dqlim = np.float64([ 30*rpd,  # <- joint 1 + joint delta rotation limit (radians)
+    dqlim = np.float64([ 30*rpd,  # <- joint 1 + joint delta rotation limit (rad/sec)
                          30*rpd,  # <- joint 2 |
                          30*rpd,  # <- joint 3 |
                          30*rpd,  # <- joint 4 |
@@ -95,11 +95,10 @@ def get_nlink_chain(Plot3D) :
                         135*rpd,  # <- joint 3 |
                          85*rpd,  # <- joint 4 |
                         120*rpd]) # <- joint 5 /
-    dqlim = np.float64([ 30*rpd,  # <- joint 1 + joint delta rotation limit (radians)
+    dqlim = np.float64([ 30*rpd,  # <- joint 1 + joint delta rotation limit (rad/sec)
                          30*rpd,  # <- joint 2 |
                          30*rpd,  # <- joint 3 |
                          30*rpd,  # <- joint 4 |
                          30*rpd]) # <- joint 5 /
     
   return (a, u, q0, qmin, qmax, dqlim)
-

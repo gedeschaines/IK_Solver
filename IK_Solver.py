@@ -94,21 +94,24 @@ def init2D():
   """
   init_func for 2D plotting
   """
-  global line1, line2, line3, line4, time_text
+  global line1, line2, line3, line4, line5, time_text
   
   line1.set_data([], [])
   line2.set_data([], [])
   line3.set_data([], [])
   line4.set_data([], [])
+  line5.set_data([], [])
   time_text.set_text('')
-  return line4, line1, line3, line2, time_text
+
+  # return artists in drawing order
+  return line5, line1, line3, line4, line2, time_text
 
 def animate2D(n):
   """
   animation function for 2D plotting
   """
   global ik_solver, tdel
-  global line1, line2, line3, line4, time_text
+  global line1, line2, line3, line4, line5, time_text
   
   if n == 0 :
     ik_solver.set_target_pos( 3.0, 4.0, 0.0)
@@ -118,19 +121,23 @@ def animate2D(n):
   if n == 0 :
     ik_solver.zero()
     
-  (X0,Y0) = ik_solver.get_points_x0y0()
-  (X,Y)   = ik_solver.get_points_xy()
-  (XT,YT) = ik_solver.get_target_xy()
+  (X0,Y0)   = ik_solver.get_points_x0y0()
+  (X,Y)     = ik_solver.get_points_xy()
+  (XT,YT)   = ik_solver.get_target_xy()
+  (XPT,YPT) = ik_solver.get_predtgt_xy()
   
-  i   = np.size(X0) - 1
-  X0T = np.array([X0[i],XT[0]])
-  Y0T = np.array([Y0[i],YT[0]])
+  i    = np.size(X0) - 1
+  X0PT = np.array([X0[i],XPT[0]])
+  Y0PT = np.array([Y0[i],YPT[0]])
   line1.set_data(X0,Y0)
   line2.set_data(X,Y)
   line3.set_data(XT,YT)
-  line4.set_data(X0T,Y0T)
+  line4.set_data(XPT,YPT)
+  line5.set_data(X0PT,Y0PT)
   time_text.set_text('time = %.3f' % ik_solver.tsolve)
-  return line4, line1, line3, line2, time_text
+
+  # return artists in drawing order
+  return line5, line1, line3, line4, line2, time_text
 
 def init3D():
   """
@@ -158,6 +165,8 @@ def init3D():
   line9.set_data(np.array([]), np.array([]))
   line9.set_3d_properties(np.array([]))
   time_text.set_text('')
+
+  # return artists in drawing order
   return line7, line8, line9, line4, line5,\
          line6, line1, line3, line2, time_text
 
@@ -177,11 +186,12 @@ def animate3D(n):
   if n == 0 :
     ik_solver.zero()
     
-  (X0,Y0,Z0) = ik_solver.get_points_x0y0z0()
-  (X,Y,Z)    = ik_solver.get_points_xyz()
-  (XT,YT,ZT) = ik_solver.get_target_xyz()
-  (XE,YE,ZE) = ik_solver.get_endeff_xyz()
-  
+  (X0,Y0,Z0)    = ik_solver.get_points_x0y0z0()
+  (X,Y,Z)       = ik_solver.get_points_xyz()
+  (XT,YT,ZT)    = ik_solver.get_target_xyz()
+  (XE,YE,ZE)    = ik_solver.get_endeff_xyz()
+  (XPT,YPT,ZPT) = ik_solver.get_predtgt_xyz()
+
   line1.set_data(X0,Y0)
   line1.set_3d_properties(Z0)
   line2.set_data(X,Y)
@@ -199,9 +209,9 @@ def animate3D(n):
   ZEP = np.array([ax.get_zlim()[0],ZE,ZE],dtype=object)
   line5.set_data(XEP,YEP)
   line5.set_3d_properties(ZEP)
-  XTP = np.array([XT,XT,ax.get_xlim()[0]],dtype=object)
-  YTP = np.array([YT,ax.get_ylim()[1],YT],dtype=object)
-  ZTP = np.array([ax.get_zlim()[0],ZT,ZT],dtype=object)
+  XTP = np.array([XPT,XPT,ax.get_xlim()[0]],dtype=object)
+  YTP = np.array([YPT,ax.get_ylim()[1],YPT],dtype=object)
+  ZTP = np.array([ax.get_zlim()[0],ZPT,ZPT],dtype=object)
   line6.set_data(XTP,YTP)
   line6.set_3d_properties(ZTP)
   X0TP0 = np.array([X0P[0],XTP[0]],dtype=object)
@@ -218,8 +228,10 @@ def animate3D(n):
   Y0TP2 = np.array([Y0P[2],YTP[2]],dtype=object)
   Z0TP2 = np.array([Z0P[2],ZTP[2]],dtype=object)
   line9.set_data(X0TP2,Y0TP2)
-  line9.set_3d_properties(Z0TP2)  
+  line9.set_3d_properties(Z0TP2)
   time_text.set_text('time = %.3f' % ik_solver.tsolve)
+
+  # return artists in drawing order
   return line7, line8, line9, line4, line5,\
          line6, line1, line3, line2, time_text
 
@@ -264,6 +276,12 @@ if __name__ == '__main__':
     elif sval == '5' :
       IKmethod = UseDLS
       title = 'IK_Solver - Using Damped Least Squares [ref 3]'
+    elif sval == '6' :
+      IKmethod = UsePIM3dH
+      title = 'IK_Solver - Using Pseudo-Inverse Method with null space control [ref 3]'
+    elif sval == '7' :
+      IKmethod = UseDLSdH
+      title = 'IK_Solver - Using Damped Least Squares with null space control [ref 3]'
     else :
       sval     = '0'
       IKmethod = 0
@@ -305,9 +323,11 @@ if __name__ == '__main__':
                    marker='o',mew=1.0,mec='k',mfc='g')
     line2 = Line2D([],[],color='b',ls='-',lw=2.0,    # link chain in motion
                    marker='o',mew=1.0,mec='k',mfc='b')
-    line3 = Line2D([],[],color='r',ls=' ',lw=2.0,    # target location
+    line3 = Line2D([],[],color='r',ls=' ',lw=2.0,    # current target location
                    marker='x',mew=2.0,mec='r',mfc='r')
-    line4 = Line2D([],[],color='k',ls=':',lw=1.0,    # eff to tgt line
+    line4 = Line2D([],[],color='m',ls=' ',lw=2.0,    # predicted target location
+                   marker='x',mew=2.0,mec='m',mfc='m')
+    line5 = Line2D([],[],color='k',ls=':',lw=1.0,    # eff to predicted tgt line
                    marker=' ')
     time_text = ax.text(0.02, 0.95, '', transform=ax.transAxes)
     ax.set_title(title)
@@ -321,6 +341,7 @@ if __name__ == '__main__':
     ax.add_line(line2)
     ax.add_line(line3)
     ax.add_line(line4)
+    ax.add_line(line5)
     fig.canvas.draw()
   else :
     ax = fig.add_subplot(111, projection='3d')
@@ -334,13 +355,13 @@ if __name__ == '__main__':
                    marker='o',mew=1.0,mec='g',mfc='w')                           
     line5 = Line3D([],[],[],color='b',ls=' ',lw=1.0,  # eff motion in XYZ planes
                    marker='o',mew=1.0,mec='b',mfc='w')                          
-    line6 = Line3D([],[],[],color='r',ls=' ',lw=1.0,  # target in XYZ planes 
-                   marker='x',mew=1.0,mec='r',mfc='r')
-    line7 = Line3D([],[],[],color='k',ls=':',lw=1.0,  # eff to tgt line in XY plane 
+    line6 = Line3D([],[],[],color='m',ls=' ',lw=1.0,  # predicted target in XYZ planes
+                   marker='x',mew=1.0,mec='m',mfc='m')
+    line7 = Line3D([],[],[],color='k',ls=':',lw=1.0,  # eff to pred. tgt line in XY plane
                    marker=' ')
-    line8 = Line3D([],[],[],color='k',ls=':',lw=1.0,  # eff to tgt line in XZ plane
+    line8 = Line3D([],[],[],color='k',ls=':',lw=1.0,  # eff to pred. tgt line in XZ plane
                    marker=' ')
-    line9 = Line3D([],[],[],color='k',ls=':',lw=1.0,  # eff to tgt line in YZ plane 
+    line9 = Line3D([],[],[],color='k',ls=':',lw=1.0,  # eff to pred. tgt line in YZ plane
                    marker=' ')                                                             
     time_text = ax.text3D(-6.0, -7.0, 6.5, '')
     ax.set_title(title)
