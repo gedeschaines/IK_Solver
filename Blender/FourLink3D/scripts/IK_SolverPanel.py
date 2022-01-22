@@ -301,7 +301,7 @@ class ARMATURE_PT_IK_SolverPanel(bpy.types.Panel):
         layout = self.layout
         obj = context.object
         box = layout.box()
-        box.label("IK Solver Server Tools")
+        box.label(text="IK Solver Server Tools")
         box.operator("armature.ik_solver_start")
         box.operator("armature.ik_solver_update")
         box.operator("armature.ik_solver_stop")
