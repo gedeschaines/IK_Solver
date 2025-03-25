@@ -389,12 +389,18 @@ if __name__ == '__main__':
   FPS       = 10
   tdel      = 1.0/FPS
   tdel_msec = 1000.0*tdel
-  tmsec0    = 1000.0*time.clock()
+  try:
+    tmsec0 = 1000.0*time.clock()
+  except:
+    tmsec0 = 1000.0*time.process_time()
   if Plot3D == 0 :
     animate2D(0)
   else :
     animate3D(0)
-  tmsec1    = 1000.0*time.clock()
+  try:
+    tmsec1 = 1000.0*time.clock()
+  except:
+    tmsec1 = 1000.0*time.process_time()
   tstep     = tmsec1 - tmsec0
   interval  = ceil(tmsec1-tmsec0)  # allows faster than real-time
   #interval  = tdel_msec - tstep   # approximates real-time
@@ -411,18 +417,22 @@ if __name__ == '__main__':
   # Specify animation parameters and assign functions.
    
   nframes = None
+  cache   = False
   blit    = False  # blitting not working well with Matplotlib v1.5.1+
   if Record == 1 :
     nframes = 14*FPS
+    cache   = True
     blit    = False
 
   if Plot3D == 0 :
     anim = animation.FuncAnimation(fig, animate2D, init_func=init2D,
-                                   frames=nframes, blit=blit,  
+                                   frames=nframes, blit=blit,
+                                   cache_frame_data=cache,
                                    interval=interval, repeat=False)
   else :
     anim = animation.FuncAnimation(fig, animate3D, init_func=init3D,
                                    frames=nframes, blit=blit,
+                                   cache_frame_data=cache,
                                    interval=interval, repeat=False)
 
   # Begin.
