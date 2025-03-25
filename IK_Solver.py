@@ -442,7 +442,10 @@ if __name__ == '__main__':
                     metadata=dict(artist='IK_Solver'),
                     bitrate=-1)
     print("Performing IK solver iteration...")
-    filename = 'IK_Solver_' + str(IKmethod) + '.mp4'
+    if Plot3D == 0 :
+      filename = 'IK_Solver_' + str(IKmethod) + '_2D.mp4'
+    else:
+      filename = 'IK_Solver_' + str(IKmethod) + '_3D.mp4'
     anim.save(filename, writer=writer)
     print("Animation saved in file %s" % filename)
     plt.show()
