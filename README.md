@@ -3,7 +3,7 @@ IK_Solver - Inverse Kinematic Solver for n-link serial chain
 
 The interactive IK_Solver program graphically demonstrates implementation of
 several inverse kinematic solving techniques, as presented in the referenced documents,
-for two and three dimensional, revolute joint, n-link serial chains. The program
+for two and three-dimensional, revolute joint, n-link serial chains. The program
 is written entirely in version 2 and 3 compatible [Python](https://www.python.org/)
 and requires [SciPy](https://www.scipy.org/), [NumPy](https://www.numpy.org/) and [Matplotlib](https://matplotlib.org/)
 packages. A [MATLAB<sup>&reg;</sup>](https://www.mathworks.com/products/matlab.html)/[Octave](https://www.gnu.org/software/octave/)
@@ -12,8 +12,8 @@ For both Python and MATLAB<sup>&reg;</sup>/Octave variants, a video encoder appl
 [ffmpeg](https://ffmpeg.org/) or avconv from [Libav](https://github.com/libav/libav),
 is required to record graphic animations.
 
-The following images and hyperlinked video clips depict the motion of two dimensional
-(2D) and three dimensional (3D) five revolute joint, 4-link serial chains (blue line)
+The following images and hyperlinked video clips depict the motion of two-dimensional
+(2D) and three-dimensional (3D) five revolute joint, 4-link serial chains (blue line)
 as the end-effector moves from its initial position (green line) towards a moving target
 (red x). Although 14 simulation seconds (140 frames \@ 10FPS) are shown, it only took
 2.8 and 5.44 seconds for the 2D and 3D link chains respectively to reach the target. In
@@ -24,14 +24,14 @@ four links are apparent in the serial chains shown, both actually have five link
 zero length link separates two orthogonal revolute joints between the last two visible
 links; the last link considered as the end-effector.
 
-2D 4-Link Frame 0 | 2D 4-Link Frame 140
------------------ | -------------------
-<a href="https://youtu.be/sq-0xBLivSs"><img src="./docs/images/IK_Solver_3_2D_001.jpg" alt="./docs/images/IK_Solver_3_2D_001.jpg" width="450" height="300"></a>|<a href="https://youtu.be/sq-0xBLivSs"><img src="./docs/images/IK_Solver_3_2D_140.jpg" alt="./docs/images/IK_Solver_3_2D_140.jpg" width="450" height="300"></a>
+| 2D 4-Link Frame 0                                                                                                                                               | 2D 4-Link Frame 140                                                                                                                                             |
+|-----------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| <a href="https://youtu.be/sq-0xBLivSs"><img src="./docs/images/IK_Solver_3_2D_001.jpg" alt="./docs/images/IK_Solver_3_2D_001.jpg" width="450" height="300"></a> | <a href="https://youtu.be/sq-0xBLivSs"><img src="./docs/images/IK_Solver_3_2D_140.jpg" alt="./docs/images/IK_Solver_3_2D_140.jpg" width="450" height="300"></a> |
 
 
-3D 4-Link Frame 0 | 3D 4-Link Frame 140
------------------ | -------------------
-<a href="https://youtu.be/jTY7AMPonIs"><img src="./docs/images/IK_Solver_3_3D_001.jpg" alt="./docs/images/IK_Solver_3_3D_001.jpg" width="450" height="300"></a>|<a href="https://youtu.be/jTY7AMPonIs"><img src="./docs/images/IK_Solver_3_3D_140.jpg" alt="./docs/images/IK_Solver_3_3D_140.jpg" width="450" height="300"></a>
+| 3D 4-Link Frame 0                                                                                                                                               | 3D 4-Link Frame 140                                                                                                                                             |
+|-----------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| <a href="https://youtu.be/jTY7AMPonIs"><img src="./docs/images/IK_Solver_3_3D_001.jpg" alt="./docs/images/IK_Solver_3_3D_001.jpg" width="450" height="300"></a> | <a href="https://youtu.be/jTY7AMPonIs"><img src="./docs/images/IK_Solver_3_3D_140.jpg" alt="./docs/images/IK_Solver_3_3D_140.jpg" width="450" height="300"></a> |
 
 If animation recording is not selected, then during 2D link chain animation the user can move
 the cursor to a location within the drawing area and press the middle mouse button to interrupt
@@ -93,8 +93,9 @@ target's initial position and fixed velocity are hard-coded within animate2D and
 animate3D functions in IK_Solver.py, and as IK_solver class attributes et0
 and vt0 respectively in the IK_Solver_class.py file. For a 2D case, the pseudo-inverse
 null space may be used to coerce the orientation of the end-effector link segment to be
-pointing in the +X direction for the PIM3 and DLS methods. Similarly for the 3D case,
+pointing in the +X direction for the PIM3 and DLS methods. Similarly, for the 3D case 
 the null space may be used to coerce the end-effector link segment to be pointing in the
+
 +X direction.
 
 #### IK_Solver and Blender ####
@@ -109,13 +110,13 @@ above and as shown in Blender rendered images below. Clicking on the rendered im
 will link to a YouTube video or animated GIF image depicting robotic arm motion from
 initial pose (frame 0) to target intercept (frame 97).
 
-Blender Rendered 3D 4-Link Frame 0 | Blender Rendered 3D 4-Link Frame 97
----------------------------------- | -----------------------------------
-<a href="https://youtu.be/krPYutkf_1I"><img src="./docs/images/Blender_IK_Solver_7_3D_00.png" alt="./docs/images/Blender_IK_Solver_7_3D_00.png" width="450" height="300"></a>|<a href="./Blender/FourLink3D/renders/imgCGI_anim.gif"><img src="./docs/images/Blender_IK_Solver_7_3D_97.png" alt="./docs/images/Blender_IK_Solver_7_3D_97.png" width="450" height="300"></a>
+| Blender Rendered 3D 4-Link Frame 0                                                                                                                                            | Blender Rendered 3D 4-Link Frame 97                                                                                                                                                           |
+|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| <a href="https://youtu.be/krPYutkf_1I"><img src="./docs/images/Blender_IK_Solver_7_3D_00.png" alt="./docs/images/Blender_IK_Solver_7_3D_00.png" width="450" height="300"></a> | <a href="./Blender/FourLink3D/renders/imgCGI_anim.gif"><img src="./docs/images/Blender_IK_Solver_7_3D_97.png" alt="./docs/images/Blender_IK_Solver_7_3D_97.png" width="450" height="300"></a> |
 
-Blender OpenGL Render 3D 4-Link Frame 0 | Blender OpenGL Render 3D 4-Link Frame 97
---------------------------------------- | ----------------------------------------
-<a href="https://youtu.be/tMLIytBCdaw"><img src="./docs/images/Blender_IK_Solver_7_GL_00.png" alt="./docs/images/Blender_IK_Solver_7_GL_00.png" width="450" height="300"></a>|<a href="./Blender/FourLink3D/renders/imgOGL_anim.gif"><img src="./docs/images/Blender_IK_Solver_7_GL_97.png" alt="./docs/images/Blender_IK_Solver_7_GL_97.png" width="450" height="300"></a>
+| Blender OpenGL Render 3D 4-Link Frame 0                                                                                                                                       | Blender OpenGL Render 3D 4-Link Frame 97                                                                                                                                                      |
+|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| <a href="https://youtu.be/tMLIytBCdaw"><img src="./docs/images/Blender_IK_Solver_7_GL_00.png" alt="./docs/images/Blender_IK_Solver_7_GL_00.png" width="450" height="300"></a> | <a href="./Blender/FourLink3D/renders/imgOGL_anim.gif"><img src="./docs/images/Blender_IK_Solver_7_GL_97.png" alt="./docs/images/Blender_IK_Solver_7_GL_97.png" width="450" height="300"></a> |
 
 #### Further Attention ####
 
@@ -128,8 +129,8 @@ could be assembled from the sequence of saved images as a post-process.
 parametric function or read from a trajectory file.
 * Animation functions in IK_Solver.py and IK_Solver_client.py could be consolidated
 into a class to eliminate duplicative code.
-* Enhancements to target intercept prediction could include earliest possible intercept,
-and smoothing and filtering to reduce prediction error.
+* Enhancements to target intercept prediction could include the earliest possible intercept,
+or smoothing and filtering to reduce prediction error.
 * Python logging could be used instead of verbose print statements
 being manually uncommented/commented for debug, test and operational phases
 of the program's development and maintenance.
@@ -187,5 +188,4 @@ development platforms, users of IK_Solver are well-equipped to tailor the source
 code to their needs and whims.
 
 Respectfully,
-
 Gary E. Deschaines
