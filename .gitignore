@@ -1,4 +1,4 @@
-.idea/
+.idea/*
 MATLAB/octave-workspace
 MATLAB/images/*
 MATLAB/images/jpgs/*
