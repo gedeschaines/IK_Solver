@@ -186,5 +186,5 @@ practices. With the aforementioned capabilities and features of modern software
 development platforms, users of IK_Solver are well-equipped to tailor the source
 code to their needs and whims.
 
-Respectfully,
+Respectfully,  
 Gary E. Deschaines
