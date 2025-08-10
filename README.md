@@ -94,7 +94,6 @@ and vt0 respectively in the IK_Solver_class.py file. For a 2D case, the pseudo-i
 null space may be used to coerce the orientation of the end-effector link segment to be
 pointing in the +X direction for the PIM3 and DLS methods. Similarly, for the 3D case 
 the null space may be used to coerce the end-effector link segment to be pointing in the
-
 +X direction.
 
 #### IK_Solver and Blender ####
